@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springdoc.core.annotations.RouterOperation;
 import org.springdoc.core.annotations.RouterOperations;
@@ -35,6 +36,13 @@ public class MyRouter {
                             operationId = "hello",
                             summary = "Hello endpoint",
                             tags = {"Hello"},
+                            /*requestBody = @RequestBody(   // 예시용으로 넣어둔 것 여기에서는 실제로 사용하지 않음
+                                    required = true,
+                                    description = "Hello request payload",
+                                    content = @Content(
+                                            schema = @Schema(implementation = String.class)
+                                    )
+                            ),*/
                             responses = {
                                     @ApiResponse(responseCode = "200", description = "OK",
                                             content = @Content(schema = @Schema(implementation = String.class))),
