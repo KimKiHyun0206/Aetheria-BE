@@ -1,4 +1,4 @@
-package com.aetheri.application.port.out.kakao;
+package com.aetheri.domain.adapter.out.kakao;
 
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
@@ -17,11 +17,11 @@ import reactor.core.publisher.Mono;
  * */
 @Slf4j
 @Service
-public class KakaoUserInformationInquiryClient {
+public class KakaoUserInformationInquiryAdapter {
 
     private final WebClient kakaoWebClient;
 
-    public KakaoUserInformationInquiryClient(@Qualifier("kakaoWebClient") WebClient kakaoWebClient) {
+    public KakaoUserInformationInquiryAdapter(@Qualifier("kakaoWebClient") WebClient kakaoWebClient) {
         this.kakaoWebClient = kakaoWebClient;
     }
 

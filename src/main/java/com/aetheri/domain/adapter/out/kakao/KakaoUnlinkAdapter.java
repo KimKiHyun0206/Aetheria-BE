@@ -1,4 +1,4 @@
-package com.aetheri.application.port.out.kakao;
+package com.aetheri.domain.adapter.out.kakao;
 
 import com.aetheri.application.dto.UnlinkResponse;
 import com.aetheri.domain.exception.BusinessException;
@@ -13,11 +13,11 @@ import reactor.core.publisher.Mono;
  * 회원 탈퇴를 하기 위한 API
  * */
 @Service
-public class KakaoUnlinkClient {
+public class KakaoUnlinkAdapter {
 
     private final WebClient webClient;
 
-    public KakaoUnlinkClient(@Qualifier("kakaoWebClient") WebClient webClient) {
+    public KakaoUnlinkAdapter(@Qualifier("kakaoWebClient") WebClient webClient) {
         this.webClient = webClient;
     }
 

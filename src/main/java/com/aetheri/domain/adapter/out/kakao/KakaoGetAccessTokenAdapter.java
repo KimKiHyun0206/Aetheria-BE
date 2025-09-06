@@ -1,4 +1,4 @@
-package com.aetheri.application.port.out.kakao;
+package com.aetheri.domain.adapter.out.kakao;
 
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
@@ -16,14 +16,14 @@ import reactor.core.publisher.Mono;
  * 카카오 로그인 API를 사용하여 액세스 토큰을 가져오기 위한 서비스
  */
 @Service
-public class KakaoGetAccessTokenClient {
+public class KakaoGetAccessTokenAdapter {
 
     @Value("${kakao.client_id}")
     private String clientId;
 
     private final WebClient kakaoAuthWebClient;
 
-    public KakaoGetAccessTokenClient(@Qualifier("kakaoAuthWebClient") WebClient kakaoAuthWebClient) {
+    public KakaoGetAccessTokenAdapter(@Qualifier("kakaoAuthWebClient") WebClient kakaoAuthWebClient) {
         this.kakaoAuthWebClient = kakaoAuthWebClient;
     }
 

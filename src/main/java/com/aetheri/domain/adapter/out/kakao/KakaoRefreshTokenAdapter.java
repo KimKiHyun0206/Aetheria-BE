@@ -1,4 +1,4 @@
-package com.aetheri.application.port.out.kakao;
+package com.aetheri.domain.adapter.out.kakao;
 
 import com.aetheri.application.dto.KakaoTokenResponse;
 import com.aetheri.domain.exception.BusinessException;
@@ -15,13 +15,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
-public class KakaoRefreshTokenClient {
+public class KakaoRefreshTokenAdapter {
     @Value("${kakao.client_id}")
     private String clientId;
 
     private final WebClient webClient;
 
-    public KakaoRefreshTokenClient(@Qualifier("kakaoWebClient") WebClient webClient) {
+    public KakaoRefreshTokenAdapter(@Qualifier("kakaoWebClient") WebClient webClient) {
         this.webClient = webClient;
     }
 

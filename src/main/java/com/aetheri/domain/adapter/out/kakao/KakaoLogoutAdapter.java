@@ -1,4 +1,4 @@
-package com.aetheri.application.port.out.kakao;
+package com.aetheri.domain.adapter.out.kakao;
 
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
@@ -9,11 +9,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
-public class KakaoLogoutClient {
+public class KakaoLogoutAdapter {
 
     private final WebClient webClient;
 
-    public KakaoLogoutClient(@Qualifier("kakaoWebClient") WebClient webClient) {
+    public KakaoLogoutAdapter(@Qualifier("kakaoWebClient") WebClient webClient) {
         this.webClient = webClient;
     }
 

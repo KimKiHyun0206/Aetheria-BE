@@ -1,6 +1,6 @@
 package com.aetheri.interfaces.web.handler;
 
-import com.aetheri.application.port.out.kakao.KakaoGetAccessTokenClient;
+import com.aetheri.domain.adapter.out.kakao.KakaoGetAccessTokenAdapter;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ import java.net.URI;
 @Component
 @RequiredArgsConstructor
 public class KakaoHandler {
-    private final KakaoGetAccessTokenClient kakaoGetAccessTokenClient;
+    private final KakaoGetAccessTokenAdapter kakaoGetAccessTokenAdapter;
 
     @Value("${kakao.client_id}")
     private String clientId;
@@ -54,7 +54,7 @@ public class KakaoHandler {
                         "인증 코드를 응답에서 찾을 수 없습니다."
                 ));
 
-        return kakaoGetAccessTokenClient.tokenRequest(code)
+        return kakaoGetAccessTokenAdapter.tokenRequest(code)
                 .flatMap(accessToken -> {
                     log.info(accessToken.toString());
                     return ServerResponse.ok().bodyValue(Mono.empty());
