@@ -14,7 +14,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: "health,info"
 # /actuator/health: 애플리케이션 상태 확인
 # /actuator/info: 애플리케이션에 대한 임의의 정보 표시
 # /actuator/metrics: JVM, CPU, Tomcat 등의 대한 메트링 정보 제공
