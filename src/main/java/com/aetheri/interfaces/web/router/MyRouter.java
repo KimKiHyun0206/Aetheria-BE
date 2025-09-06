@@ -63,7 +63,7 @@ public class MyRouter {
                     produces = {MediaType.APPLICATION_JSON_VALUE},
                     method = RequestMethod.GET,
                     beanClass = MyHandler.class,
-                    beanMethod = "hello",   // Handler 메서드 이름과 일치해야 함
+                    beanMethod = "helloError",   // Handler 메서드 이름과 일치해야 함
                     operation = @Operation(
                             operationId = "hello error",
                             summary = "Hello error endpoint",
