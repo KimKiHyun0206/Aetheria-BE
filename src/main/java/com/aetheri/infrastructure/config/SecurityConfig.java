@@ -45,7 +45,7 @@ public class SecurityConfig {
                                 "/webjars/swagger-ui/**",
                                 "/api-docs/**"
                         ).permitAll()
-                        .pathMatchers("/api/hello").permitAll()
+                        .pathMatchers("/api/hello/**").permitAll()
                         // 위에 명시된 경로를 제외한 모든 요청은 인증된 사용자만 접근할 수 있다.
                         .anyExchange().authenticated()
                 )

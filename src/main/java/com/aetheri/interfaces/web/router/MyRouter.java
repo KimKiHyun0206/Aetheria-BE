@@ -54,4 +54,29 @@ public class MyRouter {
     public RouterFunction<ServerResponse> myRoute(MyHandler myHandler) {
         return route(GET("/api/hello"), myHandler::hello);
     }
+
+
+    @Bean
+    @RouterOperations({
+            @RouterOperation(
+                    path = "/api/hello/error",
+                    produces = {MediaType.APPLICATION_JSON_VALUE},
+                    method = RequestMethod.GET,
+                    beanClass = MyHandler.class,
+                    beanMethod = "hello",   // Handler 메서드 이름과 일치해야 함
+                    operation = @Operation(
+                            operationId = "hello error",
+                            summary = "Hello error endpoint",
+                            tags = {"Hello"},
+                            responses = {
+                                    @ApiResponse(responseCode = "200", description = "OK",
+                                            content = @Content(schema = @Schema(implementation = String.class))),
+                                    @ApiResponse(responseCode = "404", description = "Not Found")
+                            }
+                    )
+            )
+    })
+    public RouterFunction<ServerResponse> myRouteError(MyHandler handler) {
+        return route(GET("/api/hello/error"), handler::helloError);
+    }
 }
