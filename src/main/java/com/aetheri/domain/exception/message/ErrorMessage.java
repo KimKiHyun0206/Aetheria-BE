@@ -25,6 +25,7 @@ public enum ErrorMessage {
 
     // 사용자
     NOT_FOUND_RUNNER(HttpStatus.NOT_FOUND, "요청한 사용자를 찾지 못했습니다."),
+    DUPLICATE_RUNNER(HttpStatus.CONFLICT, "중복된 사용자입니다."),
     ;
 
 
