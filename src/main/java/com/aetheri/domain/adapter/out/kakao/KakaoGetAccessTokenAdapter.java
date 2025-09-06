@@ -1,5 +1,6 @@
 package com.aetheri.domain.adapter.out.kakao;
 
+import com.aetheri.application.port.out.kakao.KakaoGetAccessTokenPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
 import com.aetheri.interfaces.dto.kakao.KakaoTokenResponseDto;
@@ -16,7 +17,7 @@ import reactor.core.publisher.Mono;
  * 카카오 로그인 API를 사용하여 액세스 토큰을 가져오기 위한 서비스
  */
 @Service
-public class KakaoGetAccessTokenAdapter {
+public class KakaoGetAccessTokenAdapter implements KakaoGetAccessTokenPort {
 
     @Value("${kakao.client_id}")
     private String clientId;
@@ -30,8 +31,10 @@ public class KakaoGetAccessTokenAdapter {
     /**
      * 카카오 Access 토큰 발급을 위한 요청 코드
      * <a href="https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token">카카오 REST API</a>
+     *
      * @param code 카카오에서 발급해준 인증 코드
-     * */
+     */
+    @Override
     public Mono<KakaoTokenResponseDto> tokenRequest(String code) {
         return kakaoAuthWebClient.post()
                 .uri(uriBuilder -> uriBuilder

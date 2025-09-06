@@ -1,6 +1,7 @@
 package com.aetheri.domain.adapter.out.kakao;
 
 import com.aetheri.application.dto.KakaoTokenResponse;
+import com.aetheri.application.port.out.kakao.KakaoRefreshTokenPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
 import io.netty.handler.codec.http.HttpHeaderValues;
@@ -15,7 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
-public class KakaoRefreshTokenAdapter {
+public class KakaoRefreshTokenAdapter implements KakaoRefreshTokenPort {
     @Value("${kakao.client_id}")
     private String clientId;
 
@@ -25,6 +26,7 @@ public class KakaoRefreshTokenAdapter {
         this.webClient = webClient;
     }
 
+    @Override
     public Mono<KakaoTokenResponse> refreshAccessToken(String refreshToken) {
         return webClient.method(HttpMethod.POST)
                 .uri("/oauth/token")

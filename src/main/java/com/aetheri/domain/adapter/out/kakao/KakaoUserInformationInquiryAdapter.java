@@ -1,5 +1,6 @@
 package com.aetheri.domain.adapter.out.kakao;
 
+import com.aetheri.application.port.out.kakao.KakaoUserInformationInquiryPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
 import com.aetheri.interfaces.dto.kakao.KakaoUserInfoResponseDto;
@@ -14,10 +15,10 @@ import reactor.core.publisher.Mono;
 
 /**
  * 카카오 API를 사용해서 사용자 정보를 가져오기 위한 서비스
- * */
+ */
 @Slf4j
 @Service
-public class KakaoUserInformationInquiryAdapter {
+public class KakaoUserInformationInquiryAdapter implements KakaoUserInformationInquiryPort {
 
     private final WebClient kakaoWebClient;
 
@@ -28,7 +29,7 @@ public class KakaoUserInformationInquiryAdapter {
     /**
      * 사용자 정보를 가져오기 위한 API
      * <a href="https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info">카카오 REST API</a>
-     * */
+     */
     public Mono<KakaoUserInfoResponseDto> userInformationInquiry(String accessToken) {
         return kakaoWebClient
                 .get()
