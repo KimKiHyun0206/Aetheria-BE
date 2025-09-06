@@ -1,0 +1,32 @@
+spring:
+  main:
+    web-application-type: reactive
+
+  r2dbc:
+    url: r2dbc:mysql://localhost:3306/webflux
+    username: root
+    password: letmein
+    pool:
+      enabled: true # 커넥션 풀 활성화
+
+# Spring Actuator 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+# /actuator/health: 애플리케이션 상태 확인
+# /actuator/info: 애플리케이션에 대한 임의의 정보 표시
+# /actuator/metrics: JVM, CPU, Tomcat 등의 대한 메트링 정보 제공
+# /actuator/loggers: 애플리케이션의 로거 수준을 확인하고 동적으로 변경 가능
+# /actuator/env: 환경 변수, 시스템 속성 등 스프링 환경에 대한 정보를 보여준다. (보안에 민감한 정보 노출 가능 주의)
+
+springdoc:
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  cache:
+    disabled: true
