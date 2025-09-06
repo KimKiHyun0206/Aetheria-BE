@@ -21,6 +21,10 @@ public enum ErrorMessage {
 
     // 카카오 API
     NOT_FOUND_AUTHORIZATION_CODE(HttpStatus.NOT_FOUND, "인증 코드를 응답에서 찾을 수 없습니다"),
+
+
+    // 사용자
+    NOT_FOUND_RUNNER(HttpStatus.NOT_FOUND, "요청한 사용자를 찾지 못했습니다."),
     ;
 
 
