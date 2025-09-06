@@ -3,10 +3,10 @@ package com.aetheri.domain.adapter.out.kakao;
 import com.aetheri.application.port.out.kakao.KakaoGetAccessTokenPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
+import com.aetheri.infrastructure.config.properties.KakaoProperties;
 import com.aetheri.interfaces.dto.kakao.KakaoTokenResponseDto;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -19,13 +19,15 @@ import reactor.core.publisher.Mono;
 @Service
 public class KakaoGetAccessTokenAdapter implements KakaoGetAccessTokenPort {
 
-    @Value("${kakao.client_id}")
-    private String clientId;
+    private final String clientId;
+    private final WebClient webClient;
 
-    private final WebClient kakaoAuthWebClient;
-
-    public KakaoGetAccessTokenAdapter(@Qualifier("kakaoAuthWebClient") WebClient kakaoAuthWebClient) {
-        this.kakaoAuthWebClient = kakaoAuthWebClient;
+    public KakaoGetAccessTokenAdapter(
+            @Qualifier("kakaoAuthWebClient") WebClient webClient,
+            KakaoProperties kakaoProperties
+    ) {
+        this.webClient = webClient;
+        this.clientId = kakaoProperties.clientId();
     }
 
     /**
@@ -36,7 +38,7 @@ public class KakaoGetAccessTokenAdapter implements KakaoGetAccessTokenPort {
      */
     @Override
     public Mono<KakaoTokenResponseDto> tokenRequest(String code) {
-        return kakaoAuthWebClient.post()
+        return webClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
                         .path("/oauth/token")

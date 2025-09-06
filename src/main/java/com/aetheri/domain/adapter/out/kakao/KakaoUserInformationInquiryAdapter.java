@@ -20,10 +20,10 @@ import reactor.core.publisher.Mono;
 @Service
 public class KakaoUserInformationInquiryAdapter implements KakaoUserInformationInquiryPort {
 
-    private final WebClient kakaoWebClient;
+    private final WebClient webClient;
 
-    public KakaoUserInformationInquiryAdapter(@Qualifier("kakaoWebClient") WebClient kakaoWebClient) {
-        this.kakaoWebClient = kakaoWebClient;
+    public KakaoUserInformationInquiryAdapter(@Qualifier("kakaoWebClient") WebClient webClient) {
+        this.webClient = webClient;
     }
 
     /**
@@ -31,7 +31,7 @@ public class KakaoUserInformationInquiryAdapter implements KakaoUserInformationI
      * <a href="https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info">카카오 REST API</a>
      */
     public Mono<KakaoUserInfoResponseDto> userInformationInquiry(String accessToken) {
-        return kakaoWebClient
+        return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")

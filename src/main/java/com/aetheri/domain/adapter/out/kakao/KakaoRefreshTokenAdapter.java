@@ -4,9 +4,9 @@ import com.aetheri.application.dto.KakaoTokenResponse;
 import com.aetheri.application.port.out.kakao.KakaoRefreshTokenPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
+import com.aetheri.infrastructure.config.properties.KakaoProperties;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
@@ -17,13 +17,17 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class KakaoRefreshTokenAdapter implements KakaoRefreshTokenPort {
-    @Value("${kakao.client_id}")
-    private String clientId;
+
+    private final String clientId;
 
     private final WebClient webClient;
 
-    public KakaoRefreshTokenAdapter(@Qualifier("kakaoWebClient") WebClient webClient) {
+    public KakaoRefreshTokenAdapter(
+            @Qualifier("kakaoWebClient") WebClient webClient,
+            KakaoProperties kakaoProperties
+    ) {
         this.webClient = webClient;
+        this.clientId = kakaoProperties.clientId();
     }
 
     @Override
