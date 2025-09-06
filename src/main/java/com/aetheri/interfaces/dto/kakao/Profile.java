@@ -1,0 +1,28 @@
+package com.aetheri.interfaces.dto.kakao;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record Profile(
+
+        // 닉네임
+        @JsonProperty("nickname")
+        String nickName,
+
+        // 프로필 미리보기 이미지 URL
+        @JsonProperty("thumbnail_image_url")
+        String thumbnailImageUrl,
+
+        // 프로필 사진 URL
+        @JsonProperty("profile_image_url")
+        String profileImageUrl,
+
+        // 프로필 사진이 기본 프로필인지 여부 (true : 기본, false : 사용자 등록)
+        @JsonProperty("is_default_image")
+        String isDefaultImage,
+
+        // 닉네임이 기본 닉네임인지 여부 (true : 기본, false : 사용자 등록)
+        @JsonProperty("is_default_nickname")
+        Boolean isDefaultNickName
+) {}
