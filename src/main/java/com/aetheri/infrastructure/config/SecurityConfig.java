@@ -3,6 +3,7 @@ package com.aetheri.infrastructure.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
@@ -23,7 +24,6 @@ public class SecurityConfig {
                 // JWT를 사용하기 때문에 CSRF를 비활성화한다.
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
-                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
 
                 /*
                 Spring Security의 요청 캐싱 기능을 비활성화합니다.
@@ -46,9 +46,12 @@ public class SecurityConfig {
                                 "/api-docs/**"
                         ).permitAll()
                         .pathMatchers("/api/hello/**").permitAll()
+                        .pathMatchers("/api/oauth2/**", "/login/**").permitAll()
                         // 위에 명시된 경로를 제외한 모든 요청은 인증된 사용자만 접근할 수 있다.
                         .anyExchange().authenticated()
                 )
+                // formLogin 기능도 명시적으로 비활성화
+                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
 
                 // JWT를 사용한 세션리스(stateless) 인증이므로, 세션 저장소를 사용하지 않도록 설정한다.
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
