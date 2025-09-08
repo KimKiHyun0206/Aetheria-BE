@@ -32,7 +32,10 @@ public class SignUpService {
                                 "이미 존재하는 사용자입니다."
                         ));
                     }
-                    Runner runner = new Runner(dto.id(), dto.kakaoAccount().name());
+                    Runner runner = new Runner(
+                            dto.id(),
+                            dto.properties().get("nickname")
+                    );
                     return runnerRepositoryPort.save(runner).then();    // Mono<Void>로 변환하기 위해 then 사용
                 });
     }

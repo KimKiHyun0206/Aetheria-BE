@@ -1,5 +1,6 @@
 package com.aetheri.application.service;
 
+import com.aetheri.application.dto.SignInResponse;
 import com.aetheri.application.dto.jwt.RefreshTokenIssueResponse;
 import com.aetheri.application.port.out.jwt.JwtTokenProviderPort;
 import com.aetheri.application.port.out.kakao.KakaoGetAccessTokenPort;
@@ -48,7 +49,7 @@ public class SignInService {
         this.refreshTokenExpirationDays = jwtProperties.refreshTokenExpirationDays();
     }
 
-    public Mono<ServerResponse> login(String code) {
+    public Mono<SignInResponse> login(String code) {
         ValidationUtils.validateNotEmpty(
                 code,
                 ErrorMessage.NOT_FOUND_AUTHORIZATION_CODE,
@@ -80,17 +81,7 @@ public class SignInService {
                     String accessToken = jwtTokenProviderPort.generateAccessToken(auth);
                     RefreshTokenIssueResponse refreshToken = jwtTokenProviderPort.generateRefreshToken(auth);
 
-                    ResponseCookie cookie = ResponseCookie.from(refreshTokenCookie, refreshToken.refreshToken())
-                            .httpOnly(true)
-                            .secure(true)
-                            .path("/")
-                            .maxAge(60 * 60 * 24 * refreshTokenExpirationDays)
-                            .build();
-
-                    return ServerResponse.ok()
-                            .header(accessTokenHeader, accessToken)
-                            .cookie(cookie)
-                            .build();
+                    return Mono.just(new SignInResponse(accessToken, refreshToken.refreshToken(), 60*60*24*refreshTokenExpirationDays));
                 });
     }
 
