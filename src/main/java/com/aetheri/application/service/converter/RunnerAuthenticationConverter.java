@@ -18,7 +18,7 @@ public class RunnerAuthenticationConverter {
         );
     }
 
-    public static Authentication toAuthentication(Integer runnerId) {
+    public static Authentication toAuthentication(Long runnerId) {
         return new UsernamePasswordAuthenticationToken(
                 runnerId,               // principal
                 null,                   // credentials
