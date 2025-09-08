@@ -2,9 +2,12 @@ package com.aetheri.domain.adapter.in.jwt;
 
 import com.aetheri.application.port.out.jwt.JwtTokenResolverPort;
 import com.aetheri.application.port.out.jwt.JwtTokenValidatorPort;
+import com.aetheri.application.service.redis.refreshtoken.RefreshTokenService;
+import com.aetheri.infrastructure.config.properties.JWTProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +22,7 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,70 +32,80 @@ public class JwtAuthenticationFilter implements WebFilter {
 
     private final JwtTokenValidatorPort jwtTokenValidatorPort;
     private final JwtTokenResolverPort jwtTokenResolverPort;
+    private final RefreshTokenService refreshTokenService; // 추가
+    private final JWTProperties jwtProperties;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        String token = resolveToken(exchange.getRequest());
-        if (token != null && jwtTokenValidatorPort.validateToken(token)) {
-            // 토큰이 유효하면 인증 정보 생성
-            Long username = jwtTokenResolverPort.getIdFromToken(token);
-            List<GrantedAuthority> authorities = getAuthorities(token);
-            Authentication authentication = generateAuthentication(username, authorities);
+        String accessToken = resolveToken(exchange.getRequest());
 
-            log.debug("JWT authentication for user: {}, authorities: {}", username, authorities);
+        if (accessToken != null) {
+            if (jwtTokenValidatorPort.validateToken(accessToken)) {
+                // 정상 액세스 토큰
+                return authenticateAndContinue(exchange, chain, accessToken);
+            } else {
+                // 만료된 액세스 토큰 → 리프레시 토큰 확인
+                String refreshToken = exchange.getRequest().getHeaders().getFirst("Refresh-Token");
+                if (refreshToken != null && !refreshToken.isBlank()) {
+                    return refreshTokenService.reissueTokens(refreshToken)
+                            .flatMap(tokenResponse -> {
+                                // 새 액세스 토큰은 헤더
+                                exchange.getResponse().getHeaders().set(jwtProperties.accessTokenHeader(), "Bearer " + tokenResponse.accessToken());
 
-            // SecurityContext에 인증 정보 저장
-            return chain.filter(exchange).contextWrite(
-                    ReactiveSecurityContextHolder.withAuthentication(authentication)
-            );
+                                // 새 리프레시 토큰은 HttpOnly 쿠키로 세팅
+                                ResponseCookie cookie = ResponseCookie.from(jwtProperties.refreshTokenCookie(), tokenResponse.refreshTokenIssueResponse().refreshToken())
+                                        .httpOnly(true)
+                                        .secure(true) // HTTPS에서만
+                                        .path("/auth/refresh") // refresh API 경로 제한
+                                        .maxAge(Duration.ofDays(30))
+                                        .sameSite("Strict")
+                                        .build();
+                                exchange.getResponse().addCookie(cookie);
+
+                                // SecurityContext 인증 세팅
+                                Long id = jwtTokenResolverPort.getIdFromToken(tokenResponse.accessToken());
+                                List<GrantedAuthority> authorities = jwtTokenResolverPort.getRolesFromToken(tokenResponse.accessToken())
+                                        .stream()
+                                        .filter(role -> role != null && !role.isBlank()) // null, 빈 문자열 제거
+                                        .map(SimpleGrantedAuthority::new)
+                                        .collect(Collectors.toList());
+
+                                Authentication authentication = generateAuthentication(id, authorities);
+
+                                return chain.filter(exchange)
+                                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication));
+                            });
+                }
+            }
         }
-        return chain.filter(exchange);
+
+        return chain.filter(exchange); // 토큰 없거나 유효하지 않은 경우
     }
 
-    /**
-     * HTTP 요청 헤더에서 JWT 토큰 추출해주는 메소드.
-     * */
+    private Mono<Void> authenticateAndContinue(ServerWebExchange exchange, WebFilterChain chain, String token) {
+        Long id = jwtTokenResolverPort.getIdFromToken(token);
+        List<GrantedAuthority> authorities = jwtTokenResolverPort.getRolesFromToken(token)
+                .stream()
+                .filter(role -> role != null && !role.isBlank()) // null, 빈 문자열 제거
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+
+        Authentication authentication = generateAuthentication(id, authorities);
+
+        return chain.filter(exchange)
+                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication));
+    }
+
     private String resolveToken(ServerHttpRequest request) {
-        String bearerToken = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        String bearerToken = request.getHeaders().getFirst(jwtProperties.accessTokenHeader());
         if (StringUtils.hasText(bearerToken) && StringUtils.startsWithIgnoreCase(bearerToken, "Bearer ")) {
             return bearerToken.substring(7).trim();
         }
         return null;
     }
 
-    /**
-     * JWT 토큰의 roles 항목에서 권한들을 가져오는 메소드.
-     *
-     * @param token 권한을 가져올 JWT 토큰
-     * */
-    private List<GrantedAuthority> getAuthorities(String token) {
-        List<String> roles = jwtTokenResolverPort.getRolesFromToken(token);
-        if (roles == null) roles = List.of();
-
-        return roles.stream()
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Authentication을 만드는 메소드.
-     *
-     * @param id      JWT 토큰에 저장된 subject
-     * @param authorities   JWT 토큰에 저장된 roles
-     * */
     private Authentication generateAuthentication(Long id, List<GrantedAuthority> authorities) {
-        UserDetails userDetails = new User(
-                String.valueOf(id),   // username
-                "",         // password (JWT 인증에서는 필요 없으므로 빈 문자열)
-                authorities // authorities
-        );
-
-        return new UsernamePasswordAuthenticationToken(
-                userDetails,
-                null,
-                authorities
-        );
+        UserDetails userDetails = new User(String.valueOf(id), "", authorities);
+        return new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
     }
 }

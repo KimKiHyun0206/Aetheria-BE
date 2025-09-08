@@ -24,7 +24,7 @@ public class RefreshTokenService {
                 .flatMap(this::reissueTokens);
     }
 
-    private Mono<TokenResponse> reissueTokens(String refreshToken) {
+    public Mono<TokenResponse> reissueTokens(String refreshToken) {
         Long runnerId = jwtTokenResolverPort.getIdFromToken(refreshToken);
         Authentication authentication = AuthenticationConverter.toAuthentication(runnerId);
 
@@ -38,4 +38,5 @@ public class RefreshTokenService {
         RefreshTokenIssueResponse refreshToken = jwtTokenProviderPort.generateRefreshToken(authentication);
         return TokenResponse.of(accessToken, refreshToken);
     }
+
 }
