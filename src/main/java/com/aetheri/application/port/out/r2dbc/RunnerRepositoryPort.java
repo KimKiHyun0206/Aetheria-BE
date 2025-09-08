@@ -12,4 +12,6 @@ public interface RunnerRepositoryPort {
     Mono<Boolean> existByKakaoId(Long kakaoId);
 
     Mono<Runner> findById(Long id);
+
+    Mono<Void> deleteByKakaoId(Long kakaoId);
 }
