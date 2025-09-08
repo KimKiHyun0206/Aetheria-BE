@@ -1,0 +1,10 @@
+package com.aetheri.application.port.out.r2dbc;
+
+import com.aetheri.infrastructure.persistence.KakaoToken;
+import reactor.core.publisher.Mono;
+
+public interface KakaoTokenRepositortyPort {
+    Mono<KakaoToken> findByRunnerId(Long runnerId);
+    Mono<Void> deleteByRunnerId(Long runnerId);
+    Mono<Boolean> existByRunnerId(Long runnerId);
+}
