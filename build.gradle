@@ -27,6 +27,10 @@ dependencies {
     // R2DBC MySQL 드라이버
     implementation 'io.asyncer:r2dbc-mysql:1.4.0'
 
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+
+
     // Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4")
 
