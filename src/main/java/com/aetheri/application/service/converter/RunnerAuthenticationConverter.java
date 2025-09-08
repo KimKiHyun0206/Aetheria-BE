@@ -17,4 +17,12 @@ public class RunnerAuthenticationConverter {
                 List.of(new SimpleGrantedAuthority("ROLE_USER"))
         );
     }
+
+    public static Authentication toAuthentication(Integer runnerId) {
+        return new UsernamePasswordAuthenticationToken(
+                runnerId,               // principal
+                null,                   // credentials
+                List.of(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+    }
 }
