@@ -3,7 +3,9 @@ package com.aetheri.infrastructure.config;
 import com.aetheri.application.port.out.jwt.JwtTokenProviderPort;
 import com.aetheri.application.port.out.jwt.JwtTokenResolverPort;
 import com.aetheri.application.port.out.jwt.JwtTokenValidatorPort;
+import com.aetheri.application.service.redis.refreshtoken.RefreshTokenService;
 import com.aetheri.domain.adapter.in.jwt.JwtAuthenticationFilter;
+import com.aetheri.infrastructure.config.properties.JWTProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +23,8 @@ import org.springframework.security.web.server.context.NoOpServerSecurityContext
 public class SecurityConfig {
     private final JwtTokenResolverPort jwtTokenResolverPort;
     private final JwtTokenValidatorPort jwtTokenValidatorPort;
+    private final JWTProperties jwtProperties;
+    private final RefreshTokenService refreshTokenService;
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
@@ -62,7 +66,15 @@ public class SecurityConfig {
 
                 // SecurityWebFiltersOrder.AUTHENTICATION 위치에 JwtAuthenticationFilter를 추가한다.
                 // 이 필터는 HTTP 요청 헤더에서 JWT 토큰을 추출하고, 토큰의 유효성을 검사하여 인증 객체(Authentication)를 생성한다.
-                .addFilterAt(new JwtAuthenticationFilter(jwtTokenValidatorPort, jwtTokenResolverPort), SecurityWebFiltersOrder.AUTHENTICATION)
+                .addFilterAt(
+                        new JwtAuthenticationFilter(
+                                jwtTokenValidatorPort,
+                                jwtTokenResolverPort,
+                                refreshTokenService,
+                                jwtProperties
+                        ),
+                        SecurityWebFiltersOrder.AUTHENTICATION
+                )
                 .build();
     }
 }
