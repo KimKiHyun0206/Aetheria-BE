@@ -13,6 +13,11 @@ import reactor.core.publisher.Mono;
 public class SignOffService {
     private final KakaoTokenRepositortyPort kakaoTokenRepositortyPort;
 
+    /**
+     * JWT 토큰에서 가져온 사용자의 ID를 사용하여 삭제함
+     *
+     * @param runnerId JWT 토큰에서 가져온 사용자의 ID
+     * */
     public Mono<Void> signOff(Long runnerId) {
         return kakaoTokenRepositortyPort.existByRunnerId(runnerId)
                 .flatMap(exist -> {
