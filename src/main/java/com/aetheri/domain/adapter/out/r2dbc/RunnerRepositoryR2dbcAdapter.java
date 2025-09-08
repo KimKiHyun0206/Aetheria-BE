@@ -26,6 +26,11 @@ public class RunnerRepositoryR2dbcAdapter implements RunnerRepositoryPort {
 
     @Override
     public Mono<Boolean> existByKakaoId(Long kakaoId) {
-        return repository.existsRunnerByKakaoId(kakaoId);
+        return repository.existsByKakaoId(kakaoId);
+    }
+
+    @Override
+    public Mono<Runner> findById(Long id) {
+        return repository.findById(id);
     }
 }
