@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class RunnerAuthenticationConverter {
+public class AuthenticationConverter {
     public static Authentication toAuthentication(Runner runner) {
         return new UsernamePasswordAuthenticationToken(
                 runner.getId(),       // principal
