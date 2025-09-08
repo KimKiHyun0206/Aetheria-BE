@@ -1,4 +1,4 @@
-package com.aetheri.application.service.auth;
+package com.aetheri.application.service.sign;
 
 import com.aetheri.application.dto.SignInResponse;
 import com.aetheri.application.dto.jwt.RefreshTokenIssueResponse;
