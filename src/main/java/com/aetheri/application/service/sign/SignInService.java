@@ -6,7 +6,7 @@ import com.aetheri.application.port.out.jwt.JwtTokenProviderPort;
 import com.aetheri.application.port.out.kakao.KakaoGetAccessTokenPort;
 import com.aetheri.application.port.out.kakao.KakaoUserInformationInquiryPort;
 import com.aetheri.application.port.out.r2dbc.RunnerRepositoryPort;
-import com.aetheri.application.service.converter.RunnerAuthenticationConverter;
+import com.aetheri.application.service.converter.AuthenticationConverter;
 import com.aetheri.application.util.ValidationUtils;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
@@ -74,7 +74,7 @@ public class SignInService {
                                 })
                 )
                 .flatMap(runner -> {
-                    Authentication auth = RunnerAuthenticationConverter.toAuthentication(runner);
+                    Authentication auth = AuthenticationConverter.toAuthentication(runner);
                     String accessToken = jwtTokenProviderPort.generateAccessToken(auth);
                     RefreshTokenIssueResponse refreshToken = jwtTokenProviderPort.generateRefreshToken(auth);
 

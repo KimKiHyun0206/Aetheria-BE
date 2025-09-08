@@ -5,7 +5,7 @@ import com.aetheri.application.dto.jwt.TokenResponse;
 import com.aetheri.application.port.out.jwt.JwtTokenProviderPort;
 import com.aetheri.application.port.out.jwt.JwtTokenResolverPort;
 import com.aetheri.application.port.out.redis.RedisRefreshTokenRepositoryPort;
-import com.aetheri.application.service.converter.RunnerAuthenticationConverter;
+import com.aetheri.application.service.converter.AuthenticationConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class RefreshTokenService {
 
     private Mono<TokenResponse> reissueTokens(String refreshToken) {
         Long runnerId = jwtTokenResolverPort.getIdFromToken(refreshToken);
-        Authentication authentication = RunnerAuthenticationConverter.toAuthentication(runnerId);
+        Authentication authentication = AuthenticationConverter.toAuthentication(runnerId);
 
         return redisRefreshTokenRepositoryPort
                 .deleteRefreshToken(runnerId)
