@@ -17,11 +17,11 @@ public class JwtTokenResolver implements JwtTokenResolverPort {
 
     // 토큰에서 사용자 이름 추출
     @Override
-    public String getUsernameFromToken(String token) {
-        return parser
+    public Long getIdFromToken(String token) {
+        return Long.valueOf(parser
                 .parseClaimsJws(token)
                 .getBody()
-                .getSubject();
+                .getSubject());
     }
 
     // 권한 가져오기

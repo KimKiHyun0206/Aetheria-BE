@@ -1,6 +1,5 @@
 package com.aetheri.domain.adapter.in.jwt;
 
-import com.aetheri.application.port.out.jwt.JwtTokenProviderPort;
 import com.aetheri.application.port.out.jwt.JwtTokenResolverPort;
 import com.aetheri.application.port.out.jwt.JwtTokenValidatorPort;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,7 @@ public class JwtAuthenticationFilter implements WebFilter {
         String token = resolveToken(exchange.getRequest());
         if (token != null && jwtTokenValidatorPort.validateToken(token)) {
             // 토큰이 유효하면 인증 정보 생성
-            String username = jwtTokenResolverPort.getUsernameFromToken(token);
+            Long username = jwtTokenResolverPort.getIdFromToken(token);
             List<GrantedAuthority> authorities = getAuthorities(token);
             Authentication authentication = generateAuthentication(username, authorities);
 
@@ -79,12 +78,12 @@ public class JwtAuthenticationFilter implements WebFilter {
     /**
      * Authentication을 만드는 메소드.
      *
-     * @param username      JWT 토큰에 저장된 subject
+     * @param id      JWT 토큰에 저장된 subject
      * @param authorities   JWT 토큰에 저장된 roles
      * */
-    private Authentication generateAuthentication(String username, List<GrantedAuthority> authorities) {
+    private Authentication generateAuthentication(Long id, List<GrantedAuthority> authorities) {
         UserDetails userDetails = new User(
-                username,   // username
+                String.valueOf(id),   // username
                 "",         // password (JWT 인증에서는 필요 없으므로 빈 문자열)
                 authorities // authorities
         );
