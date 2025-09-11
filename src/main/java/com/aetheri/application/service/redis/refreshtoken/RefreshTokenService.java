@@ -38,5 +38,4 @@ public class RefreshTokenService {
         RefreshTokenIssueResponse refreshToken = jwtTokenProviderPort.generateRefreshToken(authentication);
         return TokenResponse.of(accessToken, refreshToken);
     }
-
 }
