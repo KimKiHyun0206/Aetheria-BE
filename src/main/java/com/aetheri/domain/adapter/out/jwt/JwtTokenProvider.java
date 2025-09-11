@@ -35,19 +35,20 @@ public class JwtTokenProvider implements JwtTokenProviderPort {
     public String generateAccessToken(Authentication authentication) {
         // 사용자 이름(Principal)을 토큰의 subject로 설정
         String subject = authentication.getName();
-        Date now = new Date();
-        Date expiration = new Date(now.getTime() + ACCESS_TOKEN_VALIDITY_IN_HOUR);
 
         List<String> roles = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
+        Instant now = Instant.now();
+        Instant expiration = now.plus(Duration.ofHours(ACCESS_TOKEN_VALIDITY_IN_HOUR));
+
         return Jwts.builder()
-                .setSubject(subject)        // 토큰 주체
-                .setIssuedAt(now)           // 발행 시간
-                .claim("roles", roles)   // roles 클레임에 권한 정보 추가
-                .setExpiration(expiration)  // 만료 시간
-                .signWith(KEY, SignatureAlgorithm.HS256) // 서명 (시크릿 키)
+                .setSubject(subject)
+                .setIssuedAt(Date.from(now))
+                .claim("roles", roles)
+                .setExpiration(Date.from(expiration))
+                .signWith(KEY, SignatureAlgorithm.HS256)
                 .compact();
     }
 
