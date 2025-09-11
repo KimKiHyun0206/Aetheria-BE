@@ -13,6 +13,12 @@ public class KakaoTokenRepositoryR2dbcAdapter implements KakaoTokenRepositortyPo
     private final KakaoTokenR2dbcRepository repository;
 
     @Override
+    public Mono<Void> save(Long runnerId, String accessToken, String refreshToken) {
+        return repository.save(KakaoToken.toEntity(runnerId, accessToken, refreshToken))
+                .then();
+    }
+
+    @Override
     public Mono<KakaoToken> findByRunnerId(Long runnerId) {
         return repository.findByRunnerId(runnerId);
     }
