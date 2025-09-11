@@ -21,12 +21,12 @@ public enum ErrorMessage {
 
     // 카카오 API
     NOT_FOUND_AUTHORIZATION_CODE(HttpStatus.NOT_FOUND, "인증 코드를 응답에서 찾을 수 없습니다"),
+    INVALID_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "카카오 리프레쉬 토큰이 존재하지 않습니다"),
 
 
-    // 사용자
+    // 사용자,
     NOT_FOUND_RUNNER(HttpStatus.NOT_FOUND, "요청한 사용자를 찾지 못했습니다."),
-    DUPLICATE_RUNNER(HttpStatus.CONFLICT, "중복된 사용자입니다."),
-    ;
+    DUPLICATE_RUNNER(HttpStatus.CONFLICT, "중복된 사용자입니다.");
 
 
     private final HttpStatus status;
