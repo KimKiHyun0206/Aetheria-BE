@@ -14,8 +14,21 @@ public class KakaoTokenRepositoryR2dbcAdapter implements KakaoTokenRepositortyPo
 
     @Override
     public Mono<Void> save(Long runnerId, String accessToken, String refreshToken) {
-        return repository.save(KakaoToken.toEntity(runnerId, accessToken, refreshToken))
-                .then();
+        return repository.existsByRunnerId(runnerId)
+                .flatMap(exists -> {
+                    Mono<KakaoToken> saveMono = repository.save(
+                            KakaoToken.toEntity(runnerId, accessToken, refreshToken)
+                    );
+                    if (exists) {
+                        // 기존 토큰 삭제 후 새로 저장
+                        return repository.deleteByRunnerId(runnerId)
+                                .then(saveMono)
+                                .then();
+                    } else {
+                        // 존재하지 않으면 바로 저장
+                        return saveMono.then();
+                    }
+                });
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.aetheri.domain.adapter.out.redis;
 
-import com.aetheri.application.dto.jwt.TokenResponse;
 import com.aetheri.application.port.out.redis.RedisRefreshTokenRepositoryPort;
 import com.aetheri.infrastructure.config.properties.JWTProperties;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
@@ -53,6 +52,6 @@ public class RedisRefreshTokenAdapter implements RedisRefreshTokenRepositoryPort
 
 
     private String buildKey(Long userId) {
-        return jwtProperties.redis().key().prefix() + userId + jwtProperties.redis().key().suffix();
+        return jwtProperties.redis().key().prefix() + ":" + userId + ":" + jwtProperties.redis().key().suffix();
     }
 }

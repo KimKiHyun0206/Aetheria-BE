@@ -1,6 +1,5 @@
 package com.aetheri.application.port.out.redis;
 
-import com.aetheri.application.dto.jwt.TokenResponse;
 import reactor.core.publisher.Mono;
 
 public interface RedisRefreshTokenRepositoryPort {

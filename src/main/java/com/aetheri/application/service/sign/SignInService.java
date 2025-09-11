@@ -7,6 +7,7 @@ import com.aetheri.application.port.out.kakao.KakaoGetAccessTokenPort;
 import com.aetheri.application.port.out.kakao.KakaoUserInformationInquiryPort;
 import com.aetheri.application.port.out.r2dbc.KakaoTokenRepositortyPort;
 import com.aetheri.application.port.out.r2dbc.RunnerRepositoryPort;
+import com.aetheri.application.port.out.redis.RedisRefreshTokenRepositoryPort;
 import com.aetheri.application.service.converter.AuthenticationConverter;
 import com.aetheri.application.util.ValidationUtils;
 import com.aetheri.domain.exception.BusinessException;
@@ -25,6 +26,7 @@ public class SignInService {
     private final KakaoUserInformationInquiryPort kakaoUserInformationInquiryPort;
     private final RunnerRepositoryPort runnerRepositoryPort;
     private final KakaoTokenRepositortyPort kakaoTokenRepositortyPort;
+    private final RedisRefreshTokenRepositoryPort redisRefreshTokenRepositoryPort;
     private final JwtTokenProviderPort jwtTokenProviderPort;
     private final SignUpService signUpService;
 
@@ -34,7 +36,7 @@ public class SignInService {
             KakaoGetAccessTokenPort kakaoGetAccessTokenPort,
             KakaoUserInformationInquiryPort kakaoUserInformationInquiryPort,
             RunnerRepositoryPort runnerRepositoryPort,
-            KakaoTokenRepositortyPort kakaoTokenRepositortyPort,
+            KakaoTokenRepositortyPort kakaoTokenRepositortyPort, RedisRefreshTokenRepositoryPort redisRefreshTokenRepositoryPort,
             JwtTokenProviderPort jwtTokenProviderPort,
             SignUpService signUpService,
             JWTProperties jwtProperties
@@ -43,6 +45,7 @@ public class SignInService {
         this.kakaoUserInformationInquiryPort = kakaoUserInformationInquiryPort;
         this.runnerRepositoryPort = runnerRepositoryPort;
         this.kakaoTokenRepositortyPort = kakaoTokenRepositortyPort;
+        this.redisRefreshTokenRepositoryPort = redisRefreshTokenRepositoryPort;
         this.jwtTokenProviderPort = jwtTokenProviderPort;
         this.signUpService = signUpService;
         this.refreshTokenExpirationDays = jwtProperties.refreshTokenExpirationDays();
@@ -56,7 +59,7 @@ public class SignInService {
                 .flatMap(this::getUserInfo)
                 .flatMap(this::findOrSignUpRunner)
                 .flatMap(this::saveKakaoToken)
-                .flatMap(this::issueTokens)
+                .flatMap(this::issueTokensAndSave)
                 .map(this::toSignInResponse);
     }
 
@@ -98,12 +101,14 @@ public class SignInService {
     ) {
     }
 
-    private Mono<TokenBundle> issueTokens(Long runner) {
+    private Mono<TokenBundle> issueTokensAndSave(Long runner) {
         Authentication auth = AuthenticationConverter.toAuthentication(runner);
         String accessToken = jwtTokenProviderPort.generateAccessToken(auth);
         RefreshTokenIssueResponse refreshToken = jwtTokenProviderPort.generateRefreshToken(auth);
 
-        return Mono.just(new TokenBundle(accessToken, refreshToken.refreshToken()));
+        return redisRefreshTokenRepositoryPort
+                .saveRefreshToken(runner, refreshToken.refreshToken())
+                .thenReturn(new TokenBundle(accessToken, refreshToken.refreshToken()));
     }
 
     private record TokenBundle(

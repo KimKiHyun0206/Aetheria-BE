@@ -5,6 +5,7 @@ import com.aetheri.application.port.out.kakao.KakaoRefreshTokenPort;
 import com.aetheri.application.port.out.kakao.KakaoUnlinkPort;
 import com.aetheri.application.port.out.r2dbc.KakaoTokenRepositortyPort;
 import com.aetheri.application.port.out.r2dbc.RunnerRepositoryPort;
+import com.aetheri.application.port.out.redis.RedisRefreshTokenRepositoryPort;
 import com.aetheri.infrastructure.persistence.KakaoToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ public class SignOffService {
     private final KakaoUnlinkPort kakaoUnlinkPort;
     private final KakaoRefreshTokenPort kakaoRefreshTokenPort;
     private final RunnerRepositoryPort runnerRepositoryPort;
+    private final RedisRefreshTokenRepositoryPort redisRefreshTokenRepositoryPort;
 
     /**
      * JWT 토큰에서 가져온 사용자의 ID를 사용하여 회원 탈퇴 처리
@@ -38,6 +40,8 @@ public class SignOffService {
                 .flatMap(this::unlinkKakaoUser)
                 // 데이터베이스에 저장된 카카오 토큰 삭제
                 .then(deleteKakaoToken(runnerId))
+                // Redis에서 리프레쉬 토큰 삭제
+                .then(deleteRefreshTokenFromRedis(runnerId))
                 // 데이터베이스에 저장된 회원 정보 삭제
                 .then(deleteRunner(runnerId))
                 // 성공 시 로그 출력
@@ -60,5 +64,9 @@ public class SignOffService {
 
     private Mono<Void> deleteRunner(Long runnerId) {
         return runnerRepositoryPort.deleteById(runnerId);
+    }
+
+    private Mono<Void> deleteRefreshTokenFromRedis(Long runnerId) {
+        return redisRefreshTokenRepositoryPort.deleteRefreshToken(runnerId).then();
     }
 }
