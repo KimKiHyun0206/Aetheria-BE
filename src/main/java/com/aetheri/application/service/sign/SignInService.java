@@ -5,12 +5,14 @@ import com.aetheri.application.dto.jwt.RefreshTokenIssueResponse;
 import com.aetheri.application.port.out.jwt.JwtTokenProviderPort;
 import com.aetheri.application.port.out.kakao.KakaoGetAccessTokenPort;
 import com.aetheri.application.port.out.kakao.KakaoUserInformationInquiryPort;
+import com.aetheri.application.port.out.r2dbc.KakaoTokenRepositortyPort;
 import com.aetheri.application.port.out.r2dbc.RunnerRepositoryPort;
 import com.aetheri.application.service.converter.AuthenticationConverter;
 import com.aetheri.application.util.ValidationUtils;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
 import com.aetheri.infrastructure.config.properties.JWTProperties;
+import com.aetheri.interfaces.dto.kakao.KakaoTokenResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ public class SignInService {
     private final KakaoGetAccessTokenPort kakaoGetAccessTokenPort;
     private final KakaoUserInformationInquiryPort kakaoUserInformationInquiryPort;
     private final RunnerRepositoryPort runnerRepositoryPort;
+    private final KakaoTokenRepositortyPort kakaoTokenRepositortyPort;
     private final JwtTokenProviderPort jwtTokenProviderPort;
     private final SignUpService signUpService;
 
@@ -31,6 +34,7 @@ public class SignInService {
             KakaoGetAccessTokenPort kakaoGetAccessTokenPort,
             KakaoUserInformationInquiryPort kakaoUserInformationInquiryPort,
             RunnerRepositoryPort runnerRepositoryPort,
+            KakaoTokenRepositortyPort kakaoTokenRepositortyPort,
             JwtTokenProviderPort jwtTokenProviderPort,
             SignUpService signUpService,
             JWTProperties jwtProperties
@@ -38,48 +42,78 @@ public class SignInService {
         this.kakaoGetAccessTokenPort = kakaoGetAccessTokenPort;
         this.kakaoUserInformationInquiryPort = kakaoUserInformationInquiryPort;
         this.runnerRepositoryPort = runnerRepositoryPort;
+        this.kakaoTokenRepositortyPort = kakaoTokenRepositortyPort;
         this.jwtTokenProviderPort = jwtTokenProviderPort;
         this.signUpService = signUpService;
         this.refreshTokenExpirationDays = jwtProperties.refreshTokenExpirationDays();
     }
 
     public Mono<SignInResponse> login(String code) {
+        validateCode(code);
+
+        return kakaoGetAccessTokenPort
+                .tokenRequest(code)
+                .flatMap(this::getUserInfo)
+                .flatMap(this::findOrSignUpRunner)
+                .flatMap(this::saveKakaoToken)
+                .flatMap(this::issueTokens)
+                .map(this::toSignInResponse);
+    }
+
+    private void validateCode(String code) {
         ValidationUtils.validateNotEmpty(
                 code,
                 ErrorMessage.NOT_FOUND_AUTHORIZATION_CODE,
                 "인증 코드를 찾을 수 없습니다."
         );
+    }
 
-        return kakaoGetAccessTokenPort
-                // 액세스 토큰 가져오기
-                .tokenRequest(code)
-                // 가져온 액세스 토큰으로 사용자 정보 조회하기
-                .flatMap(token -> kakaoUserInformationInquiryPort.userInformationInquiry(token.accessToken()))
-                // 만약 사용자 정보가 없다면 예외 발생
+    private Mono<KakaoTokenAndId> getUserInfo(KakaoTokenResponseDto dto) {
+        return kakaoUserInformationInquiryPort.userInformationInquiry(dto.accessToken())
                 .switchIfEmpty(Mono.error(new BusinessException(
                         ErrorMessage.NOT_FOUND_RUNNER,
                         "카카오에서 사용자 정보를 찾을 수 없습니다."
                 )))
-                // 가져온 사용자 정보로 회원가입 및 로그인 진행
-                .flatMap(userInfo ->
-                        runnerRepositoryPort.existByKakaoId(userInfo.id())
-                                .flatMap(exists -> {
-                                    // 1. 만약 존재하지 않는다면 회원가입 Mono를 반환
-                                    if (!exists) {
-                                        return signUpService.signUp(userInfo)
-                                                .then(runnerRepositoryPort.findByKakaoId(userInfo.id()));
-                                    }
-                                    // 2. 존재한다면 바로 사용자 정보를 찾아서 반환
-                                    return runnerRepositoryPort.findByKakaoId(userInfo.id());
-                                })
-                )
-                .flatMap(runner -> {
-                    Authentication auth = AuthenticationConverter.toAuthentication(runner);
-                    String accessToken = jwtTokenProviderPort.generateAccessToken(auth);
-                    RefreshTokenIssueResponse refreshToken = jwtTokenProviderPort.generateRefreshToken(auth);
-
-                    return Mono.just(new SignInResponse(accessToken, refreshToken.refreshToken(), 60*60*24*refreshTokenExpirationDays));
-                });
+                .map(userInfo -> new KakaoTokenAndId(dto.accessToken(), dto.refreshToken(), userInfo.id(), userInfo.properties().get("nickname")));
     }
 
+    private Mono<Long> saveKakaoToken(KakaoTokenAndId dto) {
+        return kakaoTokenRepositortyPort.save(dto.id(), dto.accessToken, dto.refreshToken())
+                .thenReturn(dto.id());
+    }
+
+    private Mono<KakaoTokenAndId> findOrSignUpRunner(KakaoTokenAndId dto) {
+        return runnerRepositoryPort.existByKakaoId(dto.id())
+                .flatMap(exists -> exists
+                        ? runnerRepositoryPort.findByKakaoId(dto.id())
+                        : signUpService.signUp(dto.id(), dto.name()).then(runnerRepositoryPort.findByKakaoId(dto.id()))
+                ).map(runner -> new KakaoTokenAndId(dto.accessToken(), dto.refreshToken(), runner.getId(), runner.getName()));
+    }
+
+    private record KakaoTokenAndId(
+            String accessToken,
+            String refreshToken,
+            Long id,
+            String name
+    ) {
+    }
+
+    private Mono<TokenBundle> issueTokens(Long runner) {
+        Authentication auth = AuthenticationConverter.toAuthentication(runner);
+        String accessToken = jwtTokenProviderPort.generateAccessToken(auth);
+        RefreshTokenIssueResponse refreshToken = jwtTokenProviderPort.generateRefreshToken(auth);
+
+        return Mono.just(new TokenBundle(accessToken, refreshToken.refreshToken()));
+    }
+
+    private record TokenBundle(
+            String accessToken,
+            String refreshToken
+    ) {
+    }
+
+    private SignInResponse toSignInResponse(TokenBundle tokenBundle) {
+        long expiresInSeconds = 60 * 60 * 24 * refreshTokenExpirationDays;
+        return new SignInResponse(tokenBundle.accessToken(), tokenBundle.refreshToken(), expiresInSeconds);
+    }
 }
