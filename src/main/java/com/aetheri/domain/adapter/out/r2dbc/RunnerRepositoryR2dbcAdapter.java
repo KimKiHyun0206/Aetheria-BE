@@ -38,4 +38,9 @@ public class RunnerRepositoryR2dbcAdapter implements RunnerRepositoryPort {
     public Mono<Void> deleteByKakaoId(Long kakaoId) {
         return repository.deleteByKakaoId(kakaoId);
     }
+
+    @Override
+    public Mono<Void> deleteById(Long id) {
+        return repository.deleteById(id);
+    }
 }
