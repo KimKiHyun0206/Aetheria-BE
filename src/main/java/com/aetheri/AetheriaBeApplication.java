@@ -13,5 +13,4 @@ public class AetheriaBeApplication {
     public static void main(String[] args) {
         SpringApplication.run(AetheriaBeApplication.class, args);
     }
-
 }
