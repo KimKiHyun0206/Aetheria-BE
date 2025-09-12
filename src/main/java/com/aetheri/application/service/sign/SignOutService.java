@@ -27,6 +27,10 @@ public class SignOutService {
         return kakaoTokenRepositoryPort.findByRunnerId(runnerId)
                 .flatMap(this::refreshKakaoToken)
                 .flatMap(this::kakaoLogout)
+                .onErrorResume(ex -> {
+                    log.warn("[SignOutService] 카카오 API 로그아웃 실패. runnerId={}, cause={}", runnerId, ex.toString());
+                    return Mono.empty(); // 로컬 정리 계속
+                })
                 .then(deleteKakaoToken(runnerId))
                 .then(deleteRefreshToken(runnerId))
                 .doOnSuccess(v -> log.info("[SignOutService] 로그아웃 성공: {}", runnerId));
