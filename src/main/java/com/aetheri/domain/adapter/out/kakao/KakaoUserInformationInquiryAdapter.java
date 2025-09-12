@@ -1,8 +1,10 @@
 package com.aetheri.domain.adapter.out.kakao;
 
+import com.aetheri.application.dto.UnlinkResponse;
 import com.aetheri.application.port.out.kakao.KakaoUserInformationInquiryPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
+import com.aetheri.infrastructure.handler.WebClientErrorHandler;
 import com.aetheri.interfaces.dto.kakao.KakaoUserInfoResponseDto;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.extern.slf4j.Slf4j;
@@ -39,21 +41,6 @@ public class KakaoUserInformationInquiryAdapter implements KakaoUserInformationI
                         .build(true))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken) // access token 인가
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError,
-                        resp ->
-                                Mono.error(new BusinessException(
-                                        ErrorMessage.INVALID_REQUEST_PARAMETER,
-                                        "Invalid Parameter"
-                                ))
-                )
-                .onStatus(HttpStatusCode::is5xxServerError,
-                        resp ->
-                                Mono.error(new BusinessException(
-                                        ErrorMessage.INTERNAL_SERVER_ERROR,
-                                        "Internal Server Error"
-                                ))
-                )
-                .bodyToMono(KakaoUserInfoResponseDto.class);
+                .exchangeToMono(WebClientErrorHandler.handleErrors(KakaoUserInfoResponseDto.class));
     }
 }

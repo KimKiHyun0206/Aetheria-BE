@@ -1,9 +1,11 @@
 package com.aetheri.domain.adapter.out.kakao;
 
+import com.aetheri.application.dto.KakaoTokenResponse;
 import com.aetheri.application.dto.UnlinkResponse;
 import com.aetheri.application.port.out.kakao.KakaoUnlinkPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
+import com.aetheri.infrastructure.handler.WebClientErrorHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -33,19 +35,7 @@ public class KakaoUnlinkAdapter implements KakaoUnlinkPort {
         return webClient.post()
                 .uri("/v1/user/unlink")
                 .header("Authorization", "Bearer " + accessToken)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError,
-                        resp -> Mono.error(new BusinessException(
-                                ErrorMessage.INVALID_REQUEST_PARAMETER,
-                                "Invalid Parameter"
-                        ))
-                )
-                .onStatus(HttpStatusCode::is5xxServerError,
-                        resp -> Mono.error(new BusinessException(
-                                ErrorMessage.INTERNAL_SERVER_ERROR,
-                                "Server Error"))
-                )
-                .bodyToMono(UnlinkResponse.class)
+                .exchangeToMono(WebClientErrorHandler.handleErrors(UnlinkResponse.class))
                 .map(UnlinkResponse::id);
     }
 }
