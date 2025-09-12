@@ -9,7 +9,7 @@ public interface RunnerRepositoryPort {
 
     Mono<Runner> save(Runner runner);
 
-    Mono<Boolean> existByKakaoId(Long kakaoId);
+    Mono<Boolean> existsByKakaoId(Long kakaoId);
 
     Mono<Runner> findById(Long id);
 

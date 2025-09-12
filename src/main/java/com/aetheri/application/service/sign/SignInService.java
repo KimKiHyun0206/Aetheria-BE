@@ -93,7 +93,7 @@ public class SignInService {
     }
 
     private Mono<KakaoTokenAndId> findOrSignUpRunner(KakaoTokenAndId dto) {
-        return runnerRepositoryPort.existByKakaoId(dto.id())
+        return runnerRepositoryPort.existsByKakaoId(dto.id())
                 .flatMap(exists -> exists
                         ? runnerRepositoryPort.findByKakaoId(dto.id())
                         : signUpService.signUp(dto.id(), dto.name()).then(runnerRepositoryPort.findByKakaoId(dto.id()))

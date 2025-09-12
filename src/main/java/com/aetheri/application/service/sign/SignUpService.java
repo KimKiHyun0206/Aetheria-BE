@@ -4,7 +4,6 @@ import com.aetheri.application.port.out.r2dbc.RunnerRepositoryPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
 import com.aetheri.infrastructure.persistence.Runner;
-import com.aetheri.interfaces.dto.kakao.KakaoUserInfoResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,7 @@ public class SignUpService {
      * */
     public Mono<Void> signUp(Long id, String name) {
         // 1. 카카오 ID로 사용자가 존재하는지 확인
-        return runnerRepositoryPort.existByKakaoId(id)
+        return runnerRepositoryPort.existsByKakaoId(id)
                 // 2. 만약 이미 존재한다면, (true -> false)가 되어 스트림이 비어버림
                 .filter(isExist -> !isExist)
                 // 3. 스트림이 비었을 때 (사용자가 존재할 때), 에러 발생
