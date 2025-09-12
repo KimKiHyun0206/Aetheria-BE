@@ -3,6 +3,7 @@ package com.aetheri.interfaces.web.handler;
 import com.aetheri.application.service.sign.SignInService;
 import com.aetheri.application.service.sign.SignOffService;
 import com.aetheri.application.service.sign.SignOutService;
+import com.aetheri.application.util.AuthenticationUtils;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
 import com.aetheri.infrastructure.config.properties.JWTProperties;
@@ -18,7 +19,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -60,65 +60,51 @@ public class AuthHandler {
      * 로그인 후 사용자 정보를 가져오게 하는 핸들러
      */
     public Mono<ServerResponse> getKakaoAccessToken(ServerRequest request) {
-        String code = request.queryParam("code")
-                .orElseThrow(() ->
-                        new BusinessException(
-                                ErrorMessage.NOT_FOUND_AUTHORIZATION_CODE,
-                                "인증 코드를 응답에서 찾을 수 없습니다."
-                        )
-                );
 
-        return signInService.login(code).flatMap(response -> {
-            log.info("[AuthHandler] 로그인 성공: \naccessToken={} \n refreshToken={}", response.accessToken(), response.refreshToken());
+        return findCodeFromUrl(request)
+                .flatMap(signInService::login)
+                .flatMap(response -> {
+                    log.info("[AuthHandler] 로그인 성공: \naccessToken={} \n refreshToken={}", response.accessToken(), response.refreshToken());
 
-            ResponseCookie cookie = ResponseCookie
-                    .from(refreshTokenCookie, response.refreshToken())
-                    .httpOnly(true)
-                    .secure(true)
-                    .path("/")
-                    .maxAge(response.refreshTokenExpirationTime())
-                    .build();
+                    ResponseCookie cookie = ResponseCookie
+                            .from(refreshTokenCookie, response.refreshToken())
+                            .httpOnly(true)
+                            .secure(true)
+                            .path("/")
+                            .maxAge(response.refreshTokenExpirationTime())
+                            .build();
 
-            return ServerResponse.ok()
-                    .header(accessTokenHeader, response.accessToken())
-                    .cookie(cookie)
-                    .body(Mono.empty(), Void.class);
-        });
+                    return ServerResponse.ok()
+                            .header(accessTokenHeader, response.accessToken())
+                            .cookie(cookie)
+                            .body(Mono.empty(), Void.class);
+                });
     }
 
     public Mono<ServerResponse> signOff(ServerRequest request) {
-        log.info("[AuthHandler] signOff");
-        return request.principal()
-                .flatMap(principal -> {
-                    Authentication authentication = (Authentication) principal;
-
-                    Long runnerId = Long.valueOf(authentication.getName());
-
-                    String authorities = authentication
-                            .getAuthorities()
-                            .stream()
-                            .map(GrantedAuthority::getAuthority)
-                            .collect(Collectors.joining(","));
-
-                    log.info("[KakaoHandler] signOff: runnerId={}, authorities={}", runnerId, authorities);
+        return AuthenticationUtils.extractRunnerIdFromRequest(request)
+                .flatMap(runnerId -> {
+                    log.info("[AuthHandler] signOff: runnerId={}", runnerId);
                     return signOffService.signOff(runnerId).then(ServerResponse.noContent().build());
                 });
     }
 
     public Mono<ServerResponse> signOut(ServerRequest request) {
-        log.info("[AuthHandler] signOut");
-        return request.principal().flatMap(principal -> {
-            Authentication authentication = (Authentication) principal;
+        return AuthenticationUtils.extractRunnerIdFromRequest(request)
+                .flatMap(runnerId -> {
+                    log.info("[AuthHandler] signOut: runnerId={}", runnerId);
+                    return signOutService.signOut(runnerId).then(ServerResponse.noContent().build());
+                });
+    }
 
-            Long runnerId = Long.valueOf(authentication.getName());
 
-            String authorities = authentication
-                    .getAuthorities()
-                    .stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.joining(", "));
-            log.info("[KakaoHandler] signOut: runnerId={}, authorities={}", runnerId, authorities);
-            return signOutService.signOut(runnerId).then(ServerResponse.noContent().build());
-        });
+    private Mono<String> findCodeFromUrl(ServerRequest request) {
+        return Mono.just(request.queryParam("code")
+                .orElseThrow(() ->
+                        new BusinessException(
+                                ErrorMessage.NOT_FOUND_AUTHORIZATION_CODE,
+                                "인증 코드를 응답에서 찾을 수 없습니다."
+                        )
+                ));
     }
 }
