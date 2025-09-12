@@ -3,7 +3,7 @@ package com.aetheri.application.service.sign;
 import com.aetheri.application.dto.KakaoTokenResponse;
 import com.aetheri.application.port.out.kakao.KakaoLogoutPort;
 import com.aetheri.application.port.out.kakao.KakaoRefreshTokenPort;
-import com.aetheri.application.port.out.r2dbc.KakaoTokenRepositortyPort;
+import com.aetheri.application.port.out.r2dbc.KakaoTokenRepositoryPort;
 import com.aetheri.application.port.out.redis.RedisRefreshTokenRepositoryPort;
 import com.aetheri.infrastructure.persistence.KakaoToken;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +18,13 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class SignOutService {
-    private final KakaoTokenRepositortyPort kakaoTokenRepositortyPort;
+    private final KakaoTokenRepositoryPort kakaoTokenRepositoryPort;
     private final KakaoRefreshTokenPort kakaoRefreshTokenPort;
     private final KakaoLogoutPort kakaoLogoutPort;
     private final RedisRefreshTokenRepositoryPort redisRefreshTokenRepositoryPort;
 
     public Mono<Void> signOut(Long runnerId) {
-        return kakaoTokenRepositortyPort.findByRunnerId(runnerId)
+        return kakaoTokenRepositoryPort.findByRunnerId(runnerId)
                 .flatMap(this::refreshKakaoToken)
                 .flatMap(this::kakaoLogout)
                 .then(deleteKakaoToken(runnerId))
@@ -42,7 +42,7 @@ public class SignOutService {
     }
 
     private Mono<Void> deleteKakaoToken(Long runnerId) {
-        return kakaoTokenRepositortyPort.deleteByRunnerId(runnerId);
+        return kakaoTokenRepositoryPort.deleteByRunnerId(runnerId);
     }
 
     private Mono<Void> deleteRefreshToken(Long runnerId) {

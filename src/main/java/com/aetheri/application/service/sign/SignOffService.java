@@ -3,7 +3,7 @@ package com.aetheri.application.service.sign;
 import com.aetheri.application.dto.KakaoTokenResponse;
 import com.aetheri.application.port.out.kakao.KakaoRefreshTokenPort;
 import com.aetheri.application.port.out.kakao.KakaoUnlinkPort;
-import com.aetheri.application.port.out.r2dbc.KakaoTokenRepositortyPort;
+import com.aetheri.application.port.out.r2dbc.KakaoTokenRepositoryPort;
 import com.aetheri.application.port.out.r2dbc.RunnerRepositoryPort;
 import com.aetheri.application.port.out.redis.RedisRefreshTokenRepositoryPort;
 import com.aetheri.infrastructure.persistence.KakaoToken;
@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class SignOffService {
-    private final KakaoTokenRepositortyPort kakaoTokenRepositortyPort;
+    private final KakaoTokenRepositoryPort kakaoTokenRepositoryPort;
     private final KakaoUnlinkPort kakaoUnlinkPort;
     private final KakaoRefreshTokenPort kakaoRefreshTokenPort;
     private final RunnerRepositoryPort runnerRepositoryPort;
@@ -31,7 +31,7 @@ public class SignOffService {
      * @param runnerId 사용자 ID
      */
     public Mono<Void> signOff(Long runnerId) {
-        return kakaoTokenRepositortyPort
+        return kakaoTokenRepositoryPort
                 // 카카오 리프레쉬 토큰을 데이터베이스에서 조회
                 .findByRunnerId(runnerId)
                 // 리프레쉬 토큰을 갱신
@@ -59,7 +59,7 @@ public class SignOffService {
     }
 
     private Mono<Void> deleteKakaoToken(Long runnerId) {
-        return kakaoTokenRepositortyPort.deleteByRunnerId(runnerId);
+        return kakaoTokenRepositoryPort.deleteByRunnerId(runnerId);
     }
 
     private Mono<Void> deleteRunner(Long runnerId) {

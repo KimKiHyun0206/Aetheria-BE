@@ -6,7 +6,7 @@ import com.aetheri.application.dto.jwt.RefreshTokenIssueResponse;
 import com.aetheri.application.port.out.jwt.JwtTokenProviderPort;
 import com.aetheri.application.port.out.kakao.KakaoGetAccessTokenPort;
 import com.aetheri.application.port.out.kakao.KakaoUserInformationInquiryPort;
-import com.aetheri.application.port.out.r2dbc.KakaoTokenRepositortyPort;
+import com.aetheri.application.port.out.r2dbc.KakaoTokenRepositoryPort;
 import com.aetheri.application.port.out.r2dbc.RunnerRepositoryPort;
 import com.aetheri.application.port.out.redis.RedisRefreshTokenRepositoryPort;
 import com.aetheri.application.service.converter.AuthenticationConverter;
@@ -24,7 +24,7 @@ public class SignInService {
     private final KakaoGetAccessTokenPort kakaoGetAccessTokenPort;
     private final KakaoUserInformationInquiryPort kakaoUserInformationInquiryPort;
     private final RunnerRepositoryPort runnerRepositoryPort;
-    private final KakaoTokenRepositortyPort kakaoTokenRepositortyPort;
+    private final KakaoTokenRepositoryPort kakaoTokenRepositoryPort;
     private final RedisRefreshTokenRepositoryPort redisRefreshTokenRepositoryPort;
     private final JwtTokenProviderPort jwtTokenProviderPort;
     private final SignUpService signUpService;
@@ -35,7 +35,7 @@ public class SignInService {
             KakaoGetAccessTokenPort kakaoGetAccessTokenPort,
             KakaoUserInformationInquiryPort kakaoUserInformationInquiryPort,
             RunnerRepositoryPort runnerRepositoryPort,
-            KakaoTokenRepositortyPort kakaoTokenRepositortyPort, RedisRefreshTokenRepositoryPort redisRefreshTokenRepositoryPort,
+            KakaoTokenRepositoryPort kakaoTokenRepositoryPort, RedisRefreshTokenRepositoryPort redisRefreshTokenRepositoryPort,
             JwtTokenProviderPort jwtTokenProviderPort,
             SignUpService signUpService,
             JWTProperties jwtProperties
@@ -43,7 +43,7 @@ public class SignInService {
         this.kakaoGetAccessTokenPort = kakaoGetAccessTokenPort;
         this.kakaoUserInformationInquiryPort = kakaoUserInformationInquiryPort;
         this.runnerRepositoryPort = runnerRepositoryPort;
-        this.kakaoTokenRepositortyPort = kakaoTokenRepositortyPort;
+        this.kakaoTokenRepositoryPort = kakaoTokenRepositoryPort;
         this.redisRefreshTokenRepositoryPort = redisRefreshTokenRepositoryPort;
         this.jwtTokenProviderPort = jwtTokenProviderPort;
         this.signUpService = signUpService;
@@ -88,7 +88,7 @@ public class SignInService {
     }
 
     private Mono<Long> saveKakaoToken(KakaoTokenAndId dto) {
-        return kakaoTokenRepositortyPort.save(dto.id(), dto.accessToken, dto.refreshToken())
+        return kakaoTokenRepositoryPort.save(dto.id(), dto.accessToken, dto.refreshToken())
                 .thenReturn(dto.id());
     }
 
