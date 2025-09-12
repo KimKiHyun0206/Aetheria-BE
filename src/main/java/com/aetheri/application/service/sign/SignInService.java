@@ -84,7 +84,18 @@ public class SignInService {
                         ErrorMessage.NOT_FOUND_RUNNER,
                         "카카오에서 사용자 정보를 찾을 수 없습니다."
                 )))
-                .map(userInfo -> new KakaoTokenAndId(dto.access_token(), dto.refresh_token(), userInfo.id(), userInfo.properties().get("nickname")));
+                .map(userInfo -> {
+                    String name = java.util.Optional.ofNullable(userInfo.properties())
+                            .map(p -> p.get("nickname"))
+                            .filter(s -> !s.isBlank())
+                            .orElseGet(() -> {
+                                var acc = userInfo.kakaoAccount();
+                                var profile = (acc != null) ? acc.profile() : null;
+                                var nick = (profile != null) ? profile.nickName() : null;
+                                return (nick != null && !nick.isBlank()) ? nick : ("runner-" + userInfo.id());
+                            });
+                    return new KakaoTokenAndId(dto.access_token(), dto.refresh_token(), userInfo.id(), name);
+                });
     }
 
     private Mono<Long> saveKakaoToken(KakaoTokenAndId dto) {
