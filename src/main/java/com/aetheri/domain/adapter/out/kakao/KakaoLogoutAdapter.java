@@ -1,12 +1,8 @@
 package com.aetheri.domain.adapter.out.kakao;
 
 import com.aetheri.application.port.out.kakao.KakaoLogoutPort;
-import com.aetheri.domain.exception.BusinessException;
-import com.aetheri.domain.exception.message.ErrorMessage;
 import com.aetheri.infrastructure.handler.WebClientErrorHandler;
-import com.aetheri.interfaces.dto.kakao.KakaoTokenResponseDto;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;

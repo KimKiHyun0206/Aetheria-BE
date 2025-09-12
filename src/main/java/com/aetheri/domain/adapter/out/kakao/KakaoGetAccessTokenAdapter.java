@@ -1,9 +1,9 @@
 package com.aetheri.domain.adapter.out.kakao;
 
+import com.aetheri.application.dto.KakaoTokenResponse;
 import com.aetheri.application.port.out.kakao.KakaoGetAccessTokenPort;
 import com.aetheri.infrastructure.config.properties.KakaoProperties;
 import com.aetheri.infrastructure.handler.WebClientErrorHandler;
-import com.aetheri.interfaces.dto.kakao.KakaoTokenResponseDto;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
@@ -35,7 +35,7 @@ public class KakaoGetAccessTokenAdapter implements KakaoGetAccessTokenPort {
      * @param code 카카오에서 발급해준 인증 코드
      */
     @Override
-    public Mono<KakaoTokenResponseDto> tokenRequest(String code) {
+    public Mono<KakaoTokenResponse> tokenRequest(String code) {
         return webClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
@@ -45,6 +45,6 @@ public class KakaoGetAccessTokenAdapter implements KakaoGetAccessTokenPort {
                         .queryParam("code", code)
                         .build(true))
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
-                .exchangeToMono(WebClientErrorHandler.handleErrors(KakaoTokenResponseDto.class));
+                .exchangeToMono(WebClientErrorHandler.handleErrors(KakaoTokenResponse.class));
     }
 }

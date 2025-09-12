@@ -1,5 +1,6 @@
 package com.aetheri.application.service.sign;
 
+import com.aetheri.application.dto.KakaoTokenResponse;
 import com.aetheri.application.dto.SignInResponse;
 import com.aetheri.application.dto.jwt.RefreshTokenIssueResponse;
 import com.aetheri.application.port.out.jwt.JwtTokenProviderPort;
@@ -12,7 +13,6 @@ import com.aetheri.application.service.converter.AuthenticationConverter;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
 import com.aetheri.infrastructure.config.properties.JWTProperties;
-import com.aetheri.interfaces.dto.kakao.KakaoTokenResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -69,7 +69,7 @@ public class SignInService {
                 )));
     }
 
-    private Mono<KakaoTokenResponseDto> getKakaoToken(String code) {
+    private Mono<KakaoTokenResponse> getKakaoToken(String code) {
         return kakaoGetAccessTokenPort.tokenRequest(code)
                 .switchIfEmpty(Mono.error(new BusinessException(
                         ErrorMessage.NOT_FOUND_ACCESS_TOKEN,
@@ -78,13 +78,13 @@ public class SignInService {
 
     }
 
-    private Mono<KakaoTokenAndId> getUserInfo(KakaoTokenResponseDto dto) {
-        return kakaoUserInformationInquiryPort.userInformationInquiry(dto.accessToken())
+    private Mono<KakaoTokenAndId> getUserInfo(KakaoTokenResponse dto) {
+        return kakaoUserInformationInquiryPort.userInformationInquiry(dto.access_token())
                 .switchIfEmpty(Mono.error(new BusinessException(
                         ErrorMessage.NOT_FOUND_RUNNER,
                         "카카오에서 사용자 정보를 찾을 수 없습니다."
                 )))
-                .map(userInfo -> new KakaoTokenAndId(dto.accessToken(), dto.refreshToken(), userInfo.id(), userInfo.properties().get("nickname")));
+                .map(userInfo -> new KakaoTokenAndId(dto.access_token(), dto.refresh_token(), userInfo.id(), userInfo.properties().get("nickname")));
     }
 
     private Mono<Long> saveKakaoToken(KakaoTokenAndId dto) {
