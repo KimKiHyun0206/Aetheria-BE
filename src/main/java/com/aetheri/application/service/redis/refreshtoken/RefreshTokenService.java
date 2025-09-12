@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +27,21 @@ public class RefreshTokenService {
     }
 
     public Mono<TokenResponse> reissueTokens(String refreshToken) {
-        return Mono.fromCallable(() -> jwtTokenResolverPort.getIdFromToken(refreshToken))
+        return extractRunnerIdReactive(refreshToken)
                 .map(AuthenticationConverter::toAuthentication)
-                .flatMap(this::deleteAndCreateTokens);
+                .flatMap(this::deleteOldTokenAndCreateNew);
+    }
+
+    private Mono<Long> extractRunnerIdReactive(String refreshToken) {
+        return Mono.fromCallable(() -> jwtTokenResolverPort.getIdFromToken(refreshToken))
+                .subscribeOn(Schedulers.boundedElastic()); // 블로킹 호출을 별도 스레드풀에서
+    }
+
+    private Mono<TokenResponse> deleteOldTokenAndCreateNew(Authentication auth) {
+        Long runnerId = Long.valueOf(auth.getName());
+        return redisRefreshTokenRepositoryPort
+                .deleteRefreshToken(runnerId)
+                .then(Mono.fromCallable(() -> createTokenResponse(auth)));
     }
 
     private Mono<String> findRefreshTokenFromRedis(Long id) {
@@ -40,13 +53,6 @@ public class RefreshTokenService {
                                 "리프레쉬 토큰을 찾을 수 없습니다.")
                         )
                 );
-    }
-
-    private Mono<TokenResponse> deleteAndCreateTokens(Authentication auth) {
-        Long runnerId = Long.valueOf(auth.getName());
-        return redisRefreshTokenRepositoryPort
-                .deleteRefreshToken(runnerId)
-                .then(Mono.fromSupplier(() -> createTokenResponse(auth)));
     }
 
     private TokenResponse createTokenResponse(Authentication authentication) {
