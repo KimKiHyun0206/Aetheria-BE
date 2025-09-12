@@ -9,7 +9,6 @@ import com.aetheri.application.port.out.r2dbc.KakaoTokenRepositortyPort;
 import com.aetheri.application.port.out.r2dbc.RunnerRepositoryPort;
 import com.aetheri.application.port.out.redis.RedisRefreshTokenRepositoryPort;
 import com.aetheri.application.service.converter.AuthenticationConverter;
-import com.aetheri.application.util.ValidationUtils;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
 import com.aetheri.infrastructure.config.properties.JWTProperties;
@@ -52,10 +51,8 @@ public class SignInService {
     }
 
     public Mono<SignInResponse> login(String code) {
-        validateCode(code);
-
-        return kakaoGetAccessTokenPort
-                .tokenRequest(code)
+        return validateCode(code)
+                .flatMap(this::getKakaoToken)
                 .flatMap(this::getUserInfo)
                 .flatMap(this::findOrSignUpRunner)
                 .flatMap(this::saveKakaoToken)
@@ -63,12 +60,22 @@ public class SignInService {
                 .map(this::toSignInResponse);
     }
 
-    private void validateCode(String code) {
-        ValidationUtils.validateNotEmpty(
-                code,
-                ErrorMessage.NOT_FOUND_AUTHORIZATION_CODE,
-                "인증 코드를 찾을 수 없습니다."
-        );
+    private Mono<String> validateCode(String code) {
+        return Mono.fromSupplier(() -> code)
+                .filter(c -> c != null && !c.trim().isEmpty())
+                .switchIfEmpty(Mono.error(new BusinessException(
+                        ErrorMessage.NOT_FOUND_AUTHORIZATION_CODE,
+                        "인증 코드를 찾을 수 없습니다."
+                )));
+    }
+
+    private Mono<KakaoTokenResponseDto> getKakaoToken(String code) {
+        return kakaoGetAccessTokenPort.tokenRequest(code)
+                .switchIfEmpty(Mono.error(new BusinessException(
+                        ErrorMessage.NOT_FOUND_ACCESS_TOKEN,
+                        "카카오에서 액세스 토큰을 찾을 수 없습니다."
+                )));
+
     }
 
     private Mono<KakaoTokenAndId> getUserInfo(KakaoTokenResponseDto dto) {
