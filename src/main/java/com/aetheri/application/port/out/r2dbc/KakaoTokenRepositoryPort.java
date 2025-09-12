@@ -7,5 +7,5 @@ public interface KakaoTokenRepositoryPort {
     Mono<Void> save(Long runnerId, String accessToken, String refreshToken);
     Mono<KakaoToken> findByRunnerId(Long runnerId);
     Mono<Void> deleteByRunnerId(Long runnerId);
-    Mono<Boolean> existByRunnerId(Long runnerId);
+    Mono<Boolean> existsByRunnerId(Long runnerId);
 }

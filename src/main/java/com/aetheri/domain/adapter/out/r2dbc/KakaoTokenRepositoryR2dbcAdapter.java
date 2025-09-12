@@ -42,7 +42,7 @@ public class KakaoTokenRepositoryR2dbcAdapter implements KakaoTokenRepositoryPor
     }
 
     @Override
-    public Mono<Boolean> existByRunnerId(Long runnerId) {
+    public Mono<Boolean> existsByRunnerId(Long runnerId) {
         return repository.existsByRunnerId(runnerId);
     }
 }
