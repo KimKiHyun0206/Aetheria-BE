@@ -41,7 +41,7 @@ public class RefreshTokenService {
         Long runnerId = Long.valueOf(auth.getName());
         return redisRefreshTokenRepositoryPort
                 .deleteRefreshToken(runnerId)
-                .then(Mono.fromCallable(() -> createTokenResponse(auth)));
+                .then(Mono.defer(() -> createAndSaveRefreshToken(auth, runnerId)));
     }
 
     private Mono<String> findRefreshTokenFromRedis(Long id) {
@@ -55,9 +55,11 @@ public class RefreshTokenService {
                 );
     }
 
-    private TokenResponse createTokenResponse(Authentication authentication) {
+    private Mono<TokenResponse> createAndSaveRefreshToken(Authentication authentication, Long runnerId) {
         String accessToken = jwtTokenProviderPort.generateAccessToken(authentication);
         RefreshTokenIssueResponse refreshToken = jwtTokenProviderPort.generateRefreshToken(authentication);
-        return TokenResponse.of(accessToken, refreshToken);
+        return redisRefreshTokenRepositoryPort
+                .saveRefreshToken(runnerId, refreshToken.refreshToken())
+                .thenReturn(TokenResponse.of(accessToken, refreshToken));
     }
 }
