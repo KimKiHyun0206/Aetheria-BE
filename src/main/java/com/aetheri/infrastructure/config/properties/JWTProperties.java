@@ -22,6 +22,9 @@ public record JWTProperties(
         //Access Token의 만료 기간
         Duration accessTokenValidityInHour,
 
+        // 시계 오차 허용 범위
+        int allowedClockSkewSeconds,
+
         //인증용 키
         String authorityKey,
 

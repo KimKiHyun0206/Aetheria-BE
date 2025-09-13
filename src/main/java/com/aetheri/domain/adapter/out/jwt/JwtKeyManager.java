@@ -25,19 +25,19 @@ public class JwtKeyManager {
         } catch (IllegalArgumentException e) {
             throw new BusinessException(
                     ErrorMessage.INTERNAL_SERVER_ERROR,
-                    "jwt.secret-key는 Base64 인코딩된 문자열이어야 합니다."
+                    "jwt.secret은 Base64 인코딩된 문자열이어야 합니다."
             );
         }
         if (keyBytes.length < 32) { // 256bit
             throw new BusinessException(
                     ErrorMessage.INTERNAL_SERVER_ERROR,
-                    "jwt.secret-key는 HS256에 적합한 최소 256비트 이상이어야 합니다."
+                    "jwt.secret은 HS256에 적합한 최소 256비트(32바이트) 이상이어야 합니다."
             );
         }
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.parser = Jwts.parserBuilder()
                 .setSigningKey(key)
-                .setAllowedClockSkewSeconds(30) // 시계 오차 허용
+                .setAllowedClockSkewSeconds(jwtProperties.allowedClockSkewSeconds())
                 .build();
     }
 }
