@@ -81,7 +81,7 @@ public class SignInService {
     }
 
     private Mono<KakaoTokenAndId> getUserInfo(KakaoTokenResponse dto) {
-        return kakaoUserInformationInquiryPort.userInformationInquiry(dto.access_token())
+        return kakaoUserInformationInquiryPort.userInformationInquiry(dto.accessToken())
                 .switchIfEmpty(Mono.error(new BusinessException(
                         ErrorMessage.NOT_FOUND_RUNNER,
                         "카카오에서 사용자 정보를 찾을 수 없습니다."
@@ -98,7 +98,7 @@ public class SignInService {
                                 var nick = (profile != null) ? profile.nickName() : null;
                                 return (nick != null && !nick.isBlank()) ? nick : ("runner-" + userInfo.id());
                             });
-                    return new KakaoTokenAndId(dto.access_token(), dto.refresh_token(), userInfo.id(), name);
+                    return new KakaoTokenAndId(dto.accessToken(), dto.refreshToken(), userInfo.id(), name);
                 });
     }
 

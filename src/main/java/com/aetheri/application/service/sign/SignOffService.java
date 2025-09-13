@@ -55,7 +55,7 @@ public class SignOffService {
     }
 
     private Mono<Void> unlinkKakaoUser(KakaoTokenResponse tokenResponse) {
-        return kakaoUnlinkPort.unlink(tokenResponse.access_token()).then();
+        return kakaoUnlinkPort.unlink(tokenResponse.accessToken()).then();
     }
 
     private Mono<Void> deleteKakaoToken(Long runnerId) {

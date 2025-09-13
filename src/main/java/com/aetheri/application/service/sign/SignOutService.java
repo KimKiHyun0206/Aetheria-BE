@@ -42,7 +42,7 @@ public class SignOutService {
     }
 
     private Mono<Void> kakaoLogout(KakaoTokenResponse kakaoTokenResponse) {
-        return kakaoLogoutPort.logout(kakaoTokenResponse.access_token());
+        return kakaoLogoutPort.logout(kakaoTokenResponse.accessToken());
     }
 
     private Mono<Void> deleteKakaoToken(Long runnerId) {

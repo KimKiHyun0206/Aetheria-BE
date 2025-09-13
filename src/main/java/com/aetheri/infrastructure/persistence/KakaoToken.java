@@ -18,10 +18,10 @@ public class KakaoToken {
     @Column("runner_id")
     private Long runnerId;
 
-    @Column("access_token")
+    @Column("accessToken")
     private String accessToken;
 
-    @Column("refresh_token")
+    @Column("refreshToken")
     private String refreshToken;
 
     @Builder
