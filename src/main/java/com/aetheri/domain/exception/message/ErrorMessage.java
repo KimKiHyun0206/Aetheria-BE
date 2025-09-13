@@ -25,6 +25,12 @@ public enum ErrorMessage {
     NOT_FOUND_ACCESS_TOKEN(HttpStatus.NOT_FOUND, "카카오 액세스 토큰을 찾을 수 없습니다."),
     NOT_FOUND_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "카카오 리프레쉬 토큰을 찾을 수 없습니다."),
 
+    // JWT
+    JWT_SUBJECT_IS_NOT_NUMBER(HttpStatus.BAD_REQUEST, "JWT의 subject는 숫자여야 합니다."),
+    JWT_TOKEN_IS_EMPTY(HttpStatus.BAD_REQUEST, "JWT가 null입니다."),
+    JWT_EXPIRED(HttpStatus.UNAUTHORIZED, "JWT가 만료되었습니다."),
+    JWT_INVALID(HttpStatus.UNAUTHORIZED, "JWT가 유효하지 않습니다."),
+
 
     // Redis
     NOT_FOUND_REFRESH_TOKEN_IN_REDIS(HttpStatus.NOT_FOUND, "Redis에서 리프레쉬 토큰을 찾지 못했습니다."),
