@@ -29,7 +29,7 @@ public class AuthRouter {
                     beanClass = AuthHandler.class,
                     beanMethod = "redirectToKakaoLogin",
                     operation = @Operation(
-                            operationId = "Auth",
+                            operationId = "authRedirectToKakao",
                             summary = "카카오 로그인 페이지로 리다이렉트",
                             tags = {"Auth"}
                     )
@@ -42,7 +42,7 @@ public class AuthRouter {
                     beanClass = AuthHandler.class,
                     beanMethod = "getKakaoAccessToken",
                     operation = @Operation(
-                            operationId = "Auth",
+                            operationId = "authSignIn",
                             summary = "로그인 코드로 카카오 액세스 토큰 발급",
                             tags = {"Auth"}
                     )
@@ -55,7 +55,7 @@ public class AuthRouter {
                     beanClass = AuthHandler.class,
                     beanMethod = "signOff",
                     operation = @Operation(
-                            operationId = "Auth",
+                            operationId = "authSignOff",
                             summary = "카카오 회원 탈퇴",
                             tags = {"Auth"}
                     )
@@ -68,7 +68,7 @@ public class AuthRouter {
                     beanClass = AuthHandler.class,
                     beanMethod = "signOut",
                     operation = @Operation(
-                            operationId = "Auth",
+                            operationId = "authSignOut",
                             summary = "카카오 로그아웃",
                             tags = {"Auth"}
                     )
