@@ -6,6 +6,7 @@ import com.aetheri.application.service.redis.refreshtoken.RefreshTokenService;
 import com.aetheri.infrastructure.config.properties.JWTProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -45,19 +46,22 @@ public class JwtAuthenticationFilter implements WebFilter {
                 return authenticateAndContinue(exchange, chain, accessToken);
             } else {
                 // 만료된 액세스 토큰 → 리프레시 토큰 확인
-                String refreshToken = exchange.getRequest().getHeaders().getFirst("Refresh-Token");
+                String refreshToken = getRefreshTokenFromCookie(exchange);
                 if (refreshToken != null && !refreshToken.isBlank()) {
                     return refreshTokenService.reissueTokens(refreshToken)
                             .flatMap(tokenResponse -> {
                                 // 새 액세스 토큰은 헤더
                                 exchange.getResponse().getHeaders().set(jwtProperties.accessTokenHeader(), "Bearer " + tokenResponse.accessToken());
+                                exchange.getResponse().getHeaders().add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, jwtProperties.accessTokenHeader());
 
                                 // 새 리프레시 토큰은 HttpOnly 쿠키로 세팅
-                                ResponseCookie cookie = ResponseCookie.from(jwtProperties.refreshTokenCookie(), tokenResponse.refreshTokenIssueResponse().refreshToken())
+                                ResponseCookie cookie = ResponseCookie.from(
+                                                jwtProperties.refreshTokenCookie(),
+                                                tokenResponse.refreshTokenIssueResponse().refreshToken()
+                                        )
                                         .httpOnly(true)
                                         .secure(true) // HTTPS에서만
-                                        .path("/auth/refresh") // refresh API 경로 제한
-                                        .maxAge(Duration.ofDays(30))
+                                        .maxAge(Duration.ofDays(jwtProperties.refreshTokenExpirationDays()))
                                         .sameSite("Strict")
                                         .build();
                                 exchange.getResponse().addCookie(cookie);
@@ -80,6 +84,16 @@ public class JwtAuthenticationFilter implements WebFilter {
         }
 
         return chain.filter(exchange); // 토큰 없거나 유효하지 않은 경우
+    }
+
+    private String getRefreshTokenFromCookie(ServerWebExchange exchange) {
+        ServerHttpRequest request = exchange.getRequest();
+        HttpCookie cookie = request.getCookies().getFirst(jwtProperties.refreshTokenCookie());
+
+        if (cookie != null) {
+            return cookie.getValue();
+        }
+        return null; // 쿠키가 없는 경우 null 반환
     }
 
     private Mono<Void> authenticateAndContinue(ServerWebExchange exchange, WebFilterChain chain, String token) {
