@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
@@ -11,9 +12,16 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 public class KakaoToken {
     @Id
+    @Column("id")
     private Long id;
+
+    @Column("runner_id")
     private Long runnerId;
+
+    @Column("access_token")
     private String accessToken;
+
+    @Column("refresh_token")
     private String refreshToken;
 
     @Builder

@@ -3,6 +3,7 @@ package com.aetheri.infrastructure.persistence;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
@@ -10,8 +11,13 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 public class Runner {
     @Id
+    @Column("id")
     private Long id;
+
+    @Column("kakao_id")
     private Long kakaoId;
+
+    @Column("name")
     private String name;
 
     public Runner(Long kakaoId, String name) {
