@@ -58,3 +58,6 @@ kakao:
   redirect-uri: ${KAKAO_REDIRECT_URI}
   auth-api: https://kauth.kakao.com
   api: https://kapi.kakao.com
+  connect-timeout-millis: 5000
+  response-timeout-seconds: 5
+  time-out-seconds: 5

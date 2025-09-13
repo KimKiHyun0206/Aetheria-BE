@@ -15,6 +15,14 @@ public record KakaoProperties(
         String authApi,
 
         // 일반 API의 prefix
-        String api
+        String api,
+
+        // 카카오 API 응답이 오는 데 걸리는 허용 시간
+        int responseTimeoutSeconds,
+
+        // 연결 유지를 허용하는 시간
+        int connectTimeoutMillis,
+
+        int timeOutSeconds
 ) {
 }
