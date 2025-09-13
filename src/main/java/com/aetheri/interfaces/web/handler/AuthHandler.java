@@ -9,8 +9,6 @@ import com.aetheri.domain.exception.message.ErrorMessage;
 import com.aetheri.infrastructure.config.properties.JWTProperties;
 import com.aetheri.infrastructure.config.properties.KakaoProperties;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -71,6 +69,7 @@ public class AuthHandler {
                             .httpOnly(true)
                             .secure(true)
                             .path("/")
+                            .sameSite("Strict")
                             .maxAge(response.refreshTokenExpirationTime())
                             .build();
 
