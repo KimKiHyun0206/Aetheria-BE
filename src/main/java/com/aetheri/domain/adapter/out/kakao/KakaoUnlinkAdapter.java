@@ -34,7 +34,7 @@ public class KakaoUnlinkAdapter implements KakaoUnlinkPort {
     public Mono<Long> unlink(String accessToken) {
         return webClient.post()
                 .uri("/v1/user/unlink")
-                .header("Authorization", "Bearer " + accessToken)
+                .headers(s -> s.setBearerAuth(accessToken))
                 .exchangeToMono(WebClientErrorHandler.handleErrors(UnlinkResponse.class))
                 .map(UnlinkResponse::id);
     }
