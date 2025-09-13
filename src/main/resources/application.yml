@@ -2,10 +2,15 @@ spring:
   main:
     web-application-type: reactive
 
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
   r2dbc:
-    url: r2dbc:mysql://localhost:3306/webflux
-    username: root
-    password: letmein
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     pool:
       enabled: true # 커넥션 풀 활성화
 
@@ -30,3 +35,29 @@ springdoc:
     operations-sorter: alpha
   cache:
     disabled: true
+
+# JWT 토큰 설정
+jwt:
+  #HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용해야 한다.
+  secret: ${JWT_SECRET}
+  access-token-header: Authorization                  # 액세스 토큰 헤더
+  access-token-validity-in-hour: 3h                   # 액세스 토큰 유효기간 (시간)
+  refresh-token-cookie: ${JWT_REFRESH_TOKEN_COOKIE}   # 리프레시 토큰 쿠키 키
+  refresh-token-expiration-days: 60                   # 리프레시 토큰 유효기간 (일)
+  authority-key: auth                                 # 액세스 토큰에서 권한을 가져올 키
+  allowed-clock-skew-seconds: 30
+  # Redis
+  redis:
+    key:
+      prefix: runner                    # 레디스 저장에 필요한 키 값 중 접두어
+      suffix: token_rts                 # 레디스 저장에 필요한 키 값 중 접미어
+    max-token: 1                        # 최대로 발급 가능한 토큰의 수
+
+kakao:
+  client-id: ${KAKAO_CLIENT_ID}
+  redirect-uri: ${KAKAO_REDIRECT_URI}
+  auth-api: https://kauth.kakao.com
+  api: https://kapi.kakao.com
+  connect-timeout-millis: 5000
+  response-timeout-seconds: 5
+  time-out-seconds: 5
