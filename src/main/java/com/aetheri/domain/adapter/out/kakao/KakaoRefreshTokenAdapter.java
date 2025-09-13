@@ -19,9 +19,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 public class KakaoRefreshTokenAdapter implements KakaoRefreshTokenPort {
-
     private final String clientId;
-
     private final WebClient webClient;
 
     public KakaoRefreshTokenAdapter(
