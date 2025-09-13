@@ -18,6 +18,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 public class SignInService {
@@ -86,7 +88,9 @@ public class SignInService {
                 )))
                 .map(userInfo -> {
                     String name = java.util.Optional.ofNullable(userInfo.properties())
-                            .map(p -> p.get("nickname"))
+                            .map(p -> Optional.ofNullable(p.get("nickname")))
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
                             .filter(s -> !s.isBlank())
                             .orElseGet(() -> {
                                 var acc = userInfo.kakaoAccount();
