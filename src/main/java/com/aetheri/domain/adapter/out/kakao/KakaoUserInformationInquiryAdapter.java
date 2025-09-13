@@ -1,6 +1,5 @@
 package com.aetheri.domain.adapter.out.kakao;
 
-import com.aetheri.application.dto.UnlinkResponse;
 import com.aetheri.application.port.out.kakao.KakaoUserInformationInquiryPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
@@ -10,7 +9,6 @@ import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -33,13 +31,20 @@ public class KakaoUserInformationInquiryAdapter implements KakaoUserInformationI
      * <a href="https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info">카카오 REST API</a>
      */
     public Mono<KakaoUserInfoResponseDto> userInformationInquiry(String accessToken) {
+        if (accessToken == null || accessToken.isBlank()) {
+            return Mono.error(new BusinessException(
+                    ErrorMessage.INVALID_REQUEST_PARAMETER,
+                    "사용자 조회에 필요한 액세스 토큰이 비어있습니다."
+            ));
+        }
+
         return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
                         .path("/v2/user/me")
                         .build(true))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken) // access token 인가
+                .headers(s -> s.setBearerAuth(accessToken)) // access token 인가
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
                 .exchangeToMono(WebClientErrorHandler.handleErrors(KakaoUserInfoResponseDto.class));
     }
