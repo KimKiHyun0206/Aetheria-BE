@@ -43,9 +43,9 @@ public class KakaoRefreshTokenAdapter implements KakaoRefreshTokenPort {
         return webClient.method(HttpMethod.POST)
                 .uri("/oauth/token")
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
-                .body(BodyInserters.fromFormData("grant_type", "refreshToken")
+                .body(BodyInserters.fromFormData("grant_type", "refresh_token")
                         .with("client_id", clientId)
-                        .with("refreshToken", refreshToken)
+                        .with("refresh_token", refreshToken)
                 )
                 .exchangeToMono(WebClientErrorHandler.handleErrors(KakaoTokenResponse.class));
     }
