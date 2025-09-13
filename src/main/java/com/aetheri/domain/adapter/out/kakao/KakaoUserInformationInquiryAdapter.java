@@ -19,7 +19,6 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 public class KakaoUserInformationInquiryAdapter implements KakaoUserInformationInquiryPort {
-
     private final WebClient webClient;
 
     public KakaoUserInformationInquiryAdapter(@Qualifier("kakaoWebClient") WebClient webClient) {

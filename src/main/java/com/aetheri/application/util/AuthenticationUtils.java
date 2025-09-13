@@ -7,8 +7,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 
+/**
+ * 사용자가 요청한 ServerRequest에서 권한을 가져오기 위한 유틸
+ * */
 @UtilityClass
 public class AuthenticationUtils {
+    /**
+     * ServerRequest에서 사용자 ID를 가져오기 위한 메소드
+     *
+     * @param request 사용자 요청
+     * */
     public static Mono<Long> extractRunnerIdFromRequest(ServerRequest request) {
         return request.principal()
                 .ofType(Authentication.class)
@@ -23,14 +31,13 @@ public class AuthenticationUtils {
                 });
     }
 
+    /**
+     * ServerRequest에서 Authentication를 가져오기 위한 메소드
+     *
+     * @param request 사용자 요청
+     * */
     public static Mono<Authentication> extractAuthenticationFromRequest(ServerRequest request) {
         return request.principal()
                 .cast(Authentication.class);
-    }
-
-    public static Mono<String> validateNotBlankMono(String value, ErrorMessage error, String message) {
-        return Mono.justOrEmpty(value)
-                .filter(v -> !v.isBlank())
-                .switchIfEmpty(Mono.error(new BusinessException(error, message)));
     }
 }

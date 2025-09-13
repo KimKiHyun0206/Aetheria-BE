@@ -16,6 +16,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+
+/**
+ * JWT 토큰을 발급해주는 컴포넌트
+ * */
 @Slf4j
 @Component
 public class JwtTokenProvider implements JwtTokenProviderPort {

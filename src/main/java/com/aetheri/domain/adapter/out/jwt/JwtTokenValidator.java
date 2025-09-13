@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 
+/**
+ * JWT 토큰이 유효한지 검사하는 컴포넌트
+ * */
 @Component
 public class JwtTokenValidator implements JwtTokenValidatorPort {
     private final SecretKey KEY;

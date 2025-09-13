@@ -1,13 +1,9 @@
 package com.aetheri.domain.adapter.out.kakao;
 
-import com.aetheri.application.dto.KakaoTokenResponse;
 import com.aetheri.application.dto.UnlinkResponse;
 import com.aetheri.application.port.out.kakao.KakaoUnlinkPort;
-import com.aetheri.domain.exception.BusinessException;
-import com.aetheri.domain.exception.message.ErrorMessage;
 import com.aetheri.infrastructure.handler.WebClientErrorHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -17,7 +13,6 @@ import reactor.core.publisher.Mono;
  */
 @Service
 public class KakaoUnlinkAdapter implements KakaoUnlinkPort {
-
     private final WebClient webClient;
 
     public KakaoUnlinkAdapter(@Qualifier("kakaoWebClient") WebClient webClient) {

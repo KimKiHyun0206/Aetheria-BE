@@ -8,9 +8,13 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
+/**
+ * Redis에 리프래쉬 토큰을 관리하기 위한 어댑터
+ *
+ * @see RedisRefreshTokenRepositoryPort
+ */
 @Service
 public class RedisRefreshTokenAdapter implements RedisRefreshTokenRepositoryPort {
-
     private final ReactiveRedisTemplate<String, String> redisTemplate;
     private final JWTProperties jwtProperties;
 

@@ -6,10 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
+/**
+ * KakaoToken 엔티티를 데이터베이스에서 관리하기 위한 어댑터
+ *
+ * @see KakaoTokenRepositoryPort
+ * */
 @Repository
 @RequiredArgsConstructor
 public class KakaoTokenRepositoryR2dbcAdapter implements KakaoTokenRepositoryPort {
-
     private final KakaoTokenR2dbcRepository repository;
 
     @Override

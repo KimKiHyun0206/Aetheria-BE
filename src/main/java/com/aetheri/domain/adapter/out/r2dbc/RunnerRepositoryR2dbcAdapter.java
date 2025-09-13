@@ -5,9 +5,13 @@ import com.aetheri.infrastructure.persistence.Runner;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
+/**
+ * Runner 엔티티를 데이터베이스에서 관리하기 위한 어댑터
+ *
+ * @see RunnerRepositoryPort
+ */
 @Repository
 public class RunnerRepositoryR2dbcAdapter implements RunnerRepositoryPort {
-
     private final RunnerR2dbcRepository repository;
 
     public RunnerRepositoryR2dbcAdapter(RunnerR2dbcRepository repository) {

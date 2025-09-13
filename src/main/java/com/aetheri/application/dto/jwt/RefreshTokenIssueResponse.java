@@ -14,13 +14,13 @@ import java.time.Instant;
  * <li>issuedAt: 리프레쉬 토큰이 발급된 시간</li>
  *
  * @author duskafka
- * */
+ */
 @Builder(access = AccessLevel.PRIVATE)
 public record RefreshTokenIssueResponse(
         String refreshToken,
         String jti,
         Instant issuedAt
-){
+) {
     public static RefreshTokenIssueResponse of(String refreshToken, String jti, Instant issuedAt) {
         return RefreshTokenIssueResponse.builder()
                 .refreshToken(refreshToken)

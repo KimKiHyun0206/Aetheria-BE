@@ -16,7 +16,6 @@ import reactor.core.publisher.Mono;
  */
 @Service
 public class KakaoGetAccessTokenAdapter implements KakaoGetAccessTokenPort {
-
     private final String clientId;
     private final WebClient webClient;
 

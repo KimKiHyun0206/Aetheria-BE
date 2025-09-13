@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 
+/**
+ * JWT 키를 생성해주는 컴포넌트
+ * */
 @Getter
 @Component
 public class JwtKeyManager {

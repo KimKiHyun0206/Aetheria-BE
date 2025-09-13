@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+/**
+ * 카카오 로그아웃 API를 사용해서 로그아웃을 진행하는 어댑터
+ * */
 @Service
 public class KakaoLogoutAdapter implements KakaoLogoutPort {
-
     private final WebClient webClient;
 
     public KakaoLogoutAdapter(@Qualifier("kakaoWebClient") WebClient webClient) {

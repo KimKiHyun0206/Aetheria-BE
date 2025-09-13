@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * JWT 토큰의 내용을 추출하기 위한 컴포넌트
+ * */
 @Component
 public class JwtTokenResolver implements JwtTokenResolverPort {
     private final JwtParser parser;
