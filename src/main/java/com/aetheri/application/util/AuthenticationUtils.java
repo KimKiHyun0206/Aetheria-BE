@@ -11,8 +11,16 @@ import reactor.core.publisher.Mono;
 public class AuthenticationUtils {
     public static Mono<Long> extractRunnerIdFromRequest(ServerRequest request) {
         return request.principal()
-                .cast(Authentication.class)
-                .map(auth -> Long.valueOf(auth.getName()));
+                .ofType(Authentication.class)
+                .flatMap(auth -> {
+                    try {
+                        return Mono.just(Long.parseLong(auth.getName()));
+                    } catch (NumberFormatException e) {
+                        return Mono.error(new BusinessException(
+                                ErrorMessage.JWT_SUBJECT_IS_NOT_NUMBER,
+                                "JWT subject가 숫자가 아닙니다."));
+                    }
+                });
     }
 
     public static Mono<Authentication> extractAuthenticationFromRequest(ServerRequest request) {
