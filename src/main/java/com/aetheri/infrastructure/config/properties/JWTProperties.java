@@ -2,6 +2,8 @@ package com.aetheri.infrastructure.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.time.Duration;
+
 @ConfigurationProperties(prefix = "jwt")
 public record JWTProperties(
         //JWT 토큰이 HTTP 헤더에 담길 때 사용될 헤더 이름 (예: Authorization)
@@ -17,8 +19,8 @@ public record JWTProperties(
         //HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용해야 합니다.
         String secret,
 
-        //Access Token의 만료 기간 (초 단위)
-        long accessTokenValidityInHour,
+        //Access Token의 만료 기간
+        Duration accessTokenValidityInHour,
 
         //인증용 키
         String authorityKey,

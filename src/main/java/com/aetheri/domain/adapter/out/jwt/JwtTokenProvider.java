@@ -21,7 +21,7 @@ import java.util.UUID;
 public class JwtTokenProvider implements JwtTokenProviderPort {
 
     private final SecretKey KEY;
-    private final long ACCESS_TOKEN_VALIDITY_IN_HOUR;
+    private final Duration ACCESS_TOKEN_VALIDITY_IN_HOUR;
     private final long REFRESH_TOKEN_VALIDATE_DAY;
 
     public JwtTokenProvider(JWTProperties jwtProperties, JwtKeyManager jwtKeyManager) {
@@ -41,7 +41,7 @@ public class JwtTokenProvider implements JwtTokenProviderPort {
                 .toList();
 
         Instant now = Instant.now();
-        Instant expiration = now.plus(Duration.ofHours(ACCESS_TOKEN_VALIDITY_IN_HOUR));
+        Instant expiration = now.plus(ACCESS_TOKEN_VALIDITY_IN_HOUR);
 
         return Jwts.builder()
                 .setSubject(subject)
