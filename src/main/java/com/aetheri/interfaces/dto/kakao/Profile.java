@@ -20,7 +20,7 @@ public record Profile(
 
         // 프로필 사진이 기본 프로필인지 여부 (true : 기본, false : 사용자 등록)
         @JsonProperty("is_default_image")
-        String isDefaultImage,
+        Boolean isDefaultImage,
 
         // 닉네임이 기본 닉네임인지 여부 (true : 기본, false : 사용자 등록)
         @JsonProperty("is_default_nickname")
