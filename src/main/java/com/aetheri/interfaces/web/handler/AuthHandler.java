@@ -1,8 +1,8 @@
 package com.aetheri.interfaces.web.handler;
 
-import com.aetheri.application.service.sign.SignInService;
-import com.aetheri.application.service.sign.SignOffService;
-import com.aetheri.application.service.sign.SignOutService;
+import com.aetheri.application.port.in.sign.SignInPort;
+import com.aetheri.application.port.in.sign.SignOffPort;
+import com.aetheri.application.port.in.sign.SignOutPort;
 import com.aetheri.application.util.AuthenticationUtils;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
@@ -21,19 +21,25 @@ import java.net.URI;
 @Slf4j
 @Component
 public class AuthHandler {
-    private final SignInService signInService;
-    private final SignOffService signOffService;
-    private final SignOutService signOutService;
+    private final SignInPort signInPort;
+    private final SignOffPort signOffPort;
+    private final SignOutPort signOutPort;
 
     private final String clientId;
     private final String redirectUri;
     private final String refreshTokenCookie;
     private final String accessTokenHeader;
 
-    public AuthHandler(SignInService signInService, SignOffService signOffService, SignOutService signOutService, KakaoProperties kakaoProperties, JWTProperties jwtProperties) {
-        this.signInService = signInService;
-        this.signOffService = signOffService;
-        this.signOutService = signOutService;
+    public AuthHandler(
+            SignInPort signInPort,
+            SignOffPort signOffPort,
+            SignOutPort signOutPort,
+            KakaoProperties kakaoProperties,
+            JWTProperties jwtProperties
+    ) {
+        this.signInPort = signInPort;
+        this.signOffPort = signOffPort;
+        this.signOutPort = signOutPort;
         this.clientId = kakaoProperties.clientId();
         this.redirectUri = kakaoProperties.redirectUri();
         this.refreshTokenCookie = jwtProperties.refreshTokenCookie();
@@ -60,7 +66,7 @@ public class AuthHandler {
     public Mono<ServerResponse> getKakaoAccessToken(ServerRequest request) {
 
         return findCodeFromUrl(request)
-                .flatMap(signInService::login)
+                .flatMap(signInPort::signIn)
                 .flatMap(response -> {
                     log.info("[AuthHandler] 로그인 성공: \naccessToken={} \n refreshToken={}", response.accessToken(), response.refreshToken());
 
@@ -84,7 +90,7 @@ public class AuthHandler {
         return AuthenticationUtils.extractRunnerIdFromRequest(request)
                 .flatMap(runnerId -> {
                     log.info("[AuthHandler] signOff: runnerId={}", runnerId);
-                    return signOffService.signOff(runnerId).then(ServerResponse.noContent().build());
+                    return signOffPort.signOff(runnerId).then(ServerResponse.noContent().build());
                 });
     }
 
@@ -92,7 +98,7 @@ public class AuthHandler {
         return AuthenticationUtils.extractRunnerIdFromRequest(request)
                 .flatMap(runnerId -> {
                     log.info("[AuthHandler] signOut: runnerId={}", runnerId);
-                    return signOutService.signOut(runnerId).then(ServerResponse.noContent().build());
+                    return signOutPort.signOut(runnerId).then(ServerResponse.noContent().build());
                 });
     }
 
