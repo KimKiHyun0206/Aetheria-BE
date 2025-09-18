@@ -1,6 +1,6 @@
 package com.aetheri.application.service.sign;
 
-import com.aetheri.application.port.in.sign.SignUpPort;
+import com.aetheri.application.port.in.sign.SignUpUseCase;
 import com.aetheri.application.port.out.r2dbc.RunnerRepositoryPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SignUpService implements SignUpPort {
+public class SignUpService implements SignUpUseCase {
     private final RunnerRepositoryPort runnerRepositoryPort;
 
     /**

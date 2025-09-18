@@ -3,7 +3,7 @@ package com.aetheri.application.service.sign;
 import com.aetheri.application.dto.KakaoTokenResponse;
 import com.aetheri.application.dto.SignInResponse;
 import com.aetheri.application.dto.jwt.RefreshTokenIssueResponse;
-import com.aetheri.application.port.in.sign.SignInPort;
+import com.aetheri.application.port.in.sign.SignInUseCase;
 import com.aetheri.application.port.out.jwt.JwtTokenProviderPort;
 import com.aetheri.application.port.out.kakao.KakaoGetAccessTokenPort;
 import com.aetheri.application.port.out.kakao.KakaoUserInformationInquiryPort;
@@ -26,7 +26,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
-public class SignInService implements SignInPort {
+public class SignInService implements SignInUseCase {
     private final KakaoGetAccessTokenPort kakaoGetAccessTokenPort;
     private final KakaoUserInformationInquiryPort kakaoUserInformationInquiryPort;
     private final RunnerRepositoryPort runnerRepositoryPort;

@@ -2,6 +2,6 @@ package com.aetheri.application.port.in.sign;
 
 import reactor.core.publisher.Mono;
 
-public interface SignOffPort {
-    Mono<Void> signOff(Long runnerId);
+public interface SignOutUseCase {
+    Mono<Void> signOut(Long runnerId);
 }

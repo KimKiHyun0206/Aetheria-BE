@@ -1,7 +1,7 @@
 package com.aetheri.application.service.sign;
 
 import com.aetheri.application.dto.KakaoTokenResponse;
-import com.aetheri.application.port.in.sign.SignOffPort;
+import com.aetheri.application.port.in.sign.SignOffUseCase;
 import com.aetheri.application.port.out.kakao.KakaoRefreshTokenPort;
 import com.aetheri.application.port.out.kakao.KakaoUnlinkPort;
 import com.aetheri.application.port.out.r2dbc.KakaoTokenRepositoryPort;
@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SignOffService implements SignOffPort {
+public class SignOffService implements SignOffUseCase {
     private final KakaoTokenRepositoryPort kakaoTokenRepositoryPort;
     private final KakaoUnlinkPort kakaoUnlinkPort;
     private final KakaoRefreshTokenPort kakaoRefreshTokenPort;
