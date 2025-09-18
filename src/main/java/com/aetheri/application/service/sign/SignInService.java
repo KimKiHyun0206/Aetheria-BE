@@ -62,7 +62,7 @@ public class SignInService implements SignInPort {
      * @param code 카카오가 발급한 로그인 코드
      */
     @Override
-    public Mono<SignInResponse> login(String code) {
+    public Mono<SignInResponse> signIn(String code) {
                 // 코드가 유효한지 검증합니다.
         return validateCode(code)
                 // 카카오에서 액세스 토큰을 가져옵니다.
