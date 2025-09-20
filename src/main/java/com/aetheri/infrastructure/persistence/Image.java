@@ -35,6 +35,9 @@ public class Image {
     @Column("proficiency")
     private Proficiency proficiency;
 
+    @Column("shared")
+    private Boolean shared;
+
     @Builder
     private Image(Long runnerId, String imagePath, String description, String location, Shape shape, Proficiency proficiency) {
         this.runnerId = runnerId;

@@ -27,5 +27,6 @@ CREATE TABLE image
     description VARCHAR(255),
     location    VARCHAR(255),
     shape       ENUM ('CIRCLE', 'SQUARE', 'TRIANGLE', 'HEXAGON'),
-    proficiency ENUM ('BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT')
+    proficiency ENUM ('BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'),
+    shared      TINYINT(1) DEFAULT 0
 );
