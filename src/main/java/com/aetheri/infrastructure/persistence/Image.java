@@ -9,8 +9,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Getter
 @Table("image")
+@Getter
 @NoArgsConstructor
 public class Image {
     @Id
@@ -20,8 +20,8 @@ public class Image {
     @Column("runner_id")
     private Long runnerId;
 
-    @Column("storage_path")
-    private String storagePath;
+    @Column("image_path")
+    private String imagePath;
 
     @Column("description")
     private String description;
@@ -36,19 +36,19 @@ public class Image {
     private Proficiency proficiency;
 
     @Builder
-    private Image(Long runnerId, String storagePath, String description, String location, Shape shape, Proficiency proficiency) {
+    private Image(Long runnerId, String imagePath, String description, String location, Shape shape, Proficiency proficiency) {
         this.runnerId = runnerId;
-        this.storagePath = storagePath;
+        this.imagePath = imagePath;
         this.description = description;
         this.location = location;
         this.shape = shape;
         this.proficiency = proficiency;
     }
 
-    public static Image toEntity(Long runnerId, String storagePath, String description, String location, Shape shape, Proficiency proficiency) {
+    public static Image toEntity(Long runnerId, String imagePath, String description, String location, Shape shape, Proficiency proficiency) {
         return Image.builder()
                 .runnerId(runnerId)
-                .storagePath(storagePath)
+                .imagePath(imagePath)
                 .description(description)
                 .location(location)
                 .shape(shape)
