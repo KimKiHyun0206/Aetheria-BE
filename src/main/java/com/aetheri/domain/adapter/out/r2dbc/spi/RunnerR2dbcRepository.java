@@ -1,4 +1,4 @@
-package com.aetheri.domain.adapter.out.r2dbc;
+package com.aetheri.domain.adapter.out.r2dbc.spi;
 
 import com.aetheri.infrastructure.persistence.Runner;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;

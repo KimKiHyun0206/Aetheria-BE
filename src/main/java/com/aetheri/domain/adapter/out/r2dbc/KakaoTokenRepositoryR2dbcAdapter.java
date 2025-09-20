@@ -1,6 +1,7 @@
 package com.aetheri.domain.adapter.out.r2dbc;
 
 import com.aetheri.application.port.out.r2dbc.KakaoTokenRepositoryPort;
+import com.aetheri.domain.adapter.out.r2dbc.spi.KakaoTokenR2dbcRepository;
 import com.aetheri.infrastructure.persistence.KakaoToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
