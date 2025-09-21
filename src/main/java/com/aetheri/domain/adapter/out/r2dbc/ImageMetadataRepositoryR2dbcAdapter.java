@@ -3,7 +3,7 @@ package com.aetheri.domain.adapter.out.r2dbc;
 import com.aetheri.application.dto.image.ImageMetadataSaveDto;
 import com.aetheri.application.dto.image.ImageMetadataUpdateRequest;
 import com.aetheri.application.port.out.image.ImageRepositoryPort;
-import com.aetheri.domain.adapter.out.r2dbc.spi.ImageR2dbcRepository;
+import com.aetheri.domain.adapter.out.r2dbc.spi.ImageMetadataR2dbcRepository;
 import com.aetheri.infrastructure.persistence.ImageMetadata;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
@@ -14,10 +14,12 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+
 @Repository
 @RequiredArgsConstructor
-public class ImageRepositoryR2dbcAdapter implements ImageRepositoryPort {
-    private final ImageR2dbcRepository imageR2dbcRepository;
+public class ImageMetadataRepositoryR2dbcAdapter implements ImageRepositoryPort {
+    private final ImageMetadataR2dbcRepository imageMetadataR2DbcRepository;
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
@@ -33,7 +35,7 @@ public class ImageRepositoryR2dbcAdapter implements ImageRepositoryPort {
                 dto.shape(),
                 dto.proficiency()
         );
-        return imageR2dbcRepository.save(entity)
+        return imageMetadataR2DbcRepository.save(entity)
                 .flatMap(this::getImageMetadataId);
     }
 
@@ -41,7 +43,7 @@ public class ImageRepositoryR2dbcAdapter implements ImageRepositoryPort {
      * 이미지의 PK로 데이터베이스에서 이미지의 메타데이터를 가져오는 메소드.
      */
     public Mono<ImageMetadata> findById(Long imageId) {
-        return imageR2dbcRepository.findById(imageId);
+        return imageMetadataR2DbcRepository.findById(imageId);
     }
 
 
@@ -49,7 +51,7 @@ public class ImageRepositoryR2dbcAdapter implements ImageRepositoryPort {
      * 이미지의 runner_id 컬럼을 사용해서 이미지의 메타데이터들을 가져오는 메소드.
      */
     public Flux<ImageMetadata> findByRunnerId(Long runnerId) {
-        return imageR2dbcRepository.findAllByRunnerId(runnerId);
+        return imageMetadataR2DbcRepository.findAllByRunnerId(runnerId);
     }
 
 
@@ -68,7 +70,8 @@ public class ImageRepositoryR2dbcAdapter implements ImageRepositoryPort {
 
         Update update = Update
                 .update("title", request.title())
-                .set("description", request.description());
+                .set("description", request.description())
+                .set("modified_at", LocalDate.now());
 
         return r2dbcEntityTemplate.update(query, update, ImageMetadata.class);
     }
@@ -77,7 +80,7 @@ public class ImageRepositoryR2dbcAdapter implements ImageRepositoryPort {
      * 이미지가 존재하는지 확인하기 위한 메소드
      */
     public Mono<Boolean> isExistImageMetadata(Long imageId) {
-        return imageR2dbcRepository.existsById(imageId);
+        return imageMetadataR2DbcRepository.existsById(imageId);
     }
 
     /**
@@ -87,20 +90,28 @@ public class ImageRepositoryR2dbcAdapter implements ImageRepositoryPort {
      * @param imageId  삭제할 이미지의 ID
      * @implNote 삭제할 이미지 메타데이터의 소유자만 삭제할 수 있도록 구현함.
      */
-    public Mono<Boolean> deleteById(Long runnerId, Long imageId) {
-        return imageR2dbcRepository.findById(imageId).flatMap(
-                imageMetadata -> {
-                    if (imageMetadata.getId().equals(runnerId)) {
-                        return imageR2dbcRepository.deleteById(imageId)
-                                .then(Mono.just(true));
-                    } else {
-                        return Mono.just(false);
-                    }
-                }
-        ).defaultIfEmpty(false);
+    public Mono<Long> deleteById(Long runnerId, Long imageId) {
+        Query query = Query.query(
+                Criteria.where("id").is(imageId)
+                        .and("runner_id").is(runnerId)
+        );
+
+        return r2dbcEntityTemplate.delete(query, ImageMetadata.class);
     }
 
-    ;
+    /**
+     * 사용자가 탈퇴할 때 모든 이미지를 삭제하기 위한 메소드
+     *
+     * @param runnerId 탈퇴할 사용자의 ID
+     * @return 삭제된 행의 갯수
+     * */
+    public Mono<Long> deleteByRunnerId(Long runnerId) {
+        Query query = Query.query(
+                Criteria.where("runner_id").is(runnerId)
+        );
+
+        return r2dbcEntityTemplate.delete(query, ImageMetadata.class);
+    }
 
     /**
      * 새로 생성된 이미지의 PK를 가져오기 위한 메소드
