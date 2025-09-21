@@ -62,7 +62,7 @@ public class ImageMetadataRepositoryR2dbcAdapter implements ImageRepositoryPort 
      * @param imageId  수정할 이미지의 ID
      * @implNote 수정할 이미지 메타데이터의 소유자만 삭제할 수 있도록 구현함.
      */
-    public Mono<Long> updateImageMetadata(Long imageId, Long runnerId, ImageMetadataUpdateRequest request) {
+    public Mono<Long> updateImageMetadata(Long runnerId, Long imageId, ImageMetadataUpdateRequest request) {
         Query query = Query.query(
                 Criteria.where("id").is(imageId)
                         .and("runner_id").is(runnerId)
