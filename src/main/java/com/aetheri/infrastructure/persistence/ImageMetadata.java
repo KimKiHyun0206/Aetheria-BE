@@ -25,6 +25,9 @@ public class ImageMetadata {
     @Column("image_path")
     private String imagePath;
 
+    @Column("title")
+    private String title;
+
     @Column("description")
     private String description;
 
@@ -41,19 +44,22 @@ public class ImageMetadata {
     private Boolean shared;
 
     @Builder
-    private ImageMetadata(Long runnerId, String imagePath, String description, String location, Shape shape, Proficiency proficiency) {
+    public ImageMetadata(Long runnerId, String imagePath, String title, String description, String location, Shape shape, Proficiency proficiency, Boolean shared) {
         this.runnerId = runnerId;
         this.imagePath = imagePath;
+        this.title = title;
         this.description = description;
         this.location = location;
         this.shape = shape;
         this.proficiency = proficiency;
+        this.shared = shared;
     }
 
     public static ImageMetadata toEntity(Long runnerId, String location, Shape shape, Proficiency proficiency) {
         return ImageMetadata.builder()
                 .runnerId(runnerId)
                 .imagePath(runnerId + "-" + UUID.randomUUID())
+                .title(location + " " + shape.name())
                 .description("설명을 추가해주세요")
                 .location(location)
                 .shape(shape)

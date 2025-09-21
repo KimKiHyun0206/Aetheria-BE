@@ -24,6 +24,7 @@ CREATE TABLE image_metadata
     id          BIGINT PRIMARY KEY AUTO_INCREMENT,
     runner_id   BIGINT,
     image_path  TEXT,
+    title       VARCHAR(255),
     description VARCHAR(255),
     location    VARCHAR(255),
     shape       ENUM ('CIRCLE', 'SQUARE', 'TRIANGLE', 'HEXAGON'),
