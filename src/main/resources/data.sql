@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS image;
 
 CREATE TABLE runner
 (
-    id       BIGINT       NOT NULL AUTO_INCREMENT,
+    id       BIGINT PRIMARY KEY AUTO_INCREMENT,
     kakao_id BIGINT       NOT NULL UNIQUE,
     name     VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
@@ -12,22 +12,26 @@ CREATE TABLE runner
 
 CREATE TABLE kakao_token
 (
-    id            BIGINT       NOT NULL AUTO_INCREMENT,
-    runner_id     BIGINT       NOT NULL,
-    access_token  VARCHAR(255) NOT NULL,
-    refresh_token VARCHAR(255) NOT NULL,
+    id            BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    runner_id     BIGINT             NOT NULL,
+    access_token  VARCHAR(255)       NOT NULL,
+    refresh_token VARCHAR(255)       NOT NULL,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE image_metadata
 (
     id          BIGINT PRIMARY KEY AUTO_INCREMENT,
-    runner_id   BIGINT,
-    image_path  TEXT,
+    runner_id   BIGINT       NOT NULL,
+    image_path  VARCHAR(255) NOT NULL,
     title       VARCHAR(255),
     description VARCHAR(255),
     location    VARCHAR(255),
-    shape       ENUM ('CIRCLE', 'SQUARE', 'TRIANGLE', 'HEXAGON'),
-    proficiency ENUM ('BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'),
-    shared      TINYINT(1) DEFAULT 0
+    shape       VARCHAR(255),
+    proficiency VARCHAR(255),
+    shared      BOOLEAN,
+    created_at  DATE,
+    modified_at DATE,
+
+    CONSTRAINT fk_runner FOREIGN KEY (runner_id) REFERENCES runner (id)
 );

@@ -1,5 +1,6 @@
 package com.aetheri.infrastructure.persistence;
 
+import com.aetheri.application.dto.image.ImageMetadataResponse;
 import com.aetheri.domain.enums.image.Proficiency;
 import com.aetheri.domain.enums.image.Shape;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Table("image_metadata")
@@ -43,8 +45,14 @@ public class ImageMetadata {
     @Column("shared")
     private Boolean shared;
 
+    @Column("created_at")
+    private LocalDate createdAt;
+
+    @Column("modified_at")
+    private LocalDate modifiedAt;
+
     @Builder
-    public ImageMetadata(Long runnerId, String imagePath, String title, String description, String location, Shape shape, Proficiency proficiency, Boolean shared) {
+    public ImageMetadata(Long runnerId, String imagePath, String title, String description, String location, Shape shape, Proficiency proficiency, Boolean shared, LocalDate createdAt, LocalDate modifiedAt) {
         this.runnerId = runnerId;
         this.imagePath = imagePath;
         this.title = title;
@@ -53,6 +61,8 @@ public class ImageMetadata {
         this.shape = shape;
         this.proficiency = proficiency;
         this.shared = shared;
+        this.createdAt = createdAt;
+        this.modifiedAt = modifiedAt;
     }
 
     public static ImageMetadata toEntity(Long runnerId, String location, Shape shape, Proficiency proficiency) {
@@ -64,6 +74,18 @@ public class ImageMetadata {
                 .location(location)
                 .shape(shape)
                 .proficiency(proficiency)
+                .createdAt(LocalDate.now())
+                .modifiedAt(LocalDate.now())
                 .build();
+    }
+
+    public ImageMetadataResponse toResponse(){
+        return new ImageMetadataResponse(
+                this.title,
+                this.description,
+                this.location,
+                this.createdAt.toString(),
+                this.modifiedAt.toString()
+        );
     }
 }
