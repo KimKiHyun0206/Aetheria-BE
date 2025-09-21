@@ -16,11 +16,7 @@ public class DeleteImageMetadataService implements DeleteImageMetadataUseCase {
     @Override
     public Mono<Void> delete(Long runnerId, Long imageId) {
         return imageMetadataRepositoryR2DbcAdapter.deleteById(runnerId, imageId)
-                .doOnSuccess(l -> logResult(runnerId, l))
+                .doOnSuccess(l -> log.info("[DeleteImageService] 사용자 {}에 의해 이미지 {}개가 삭제되었습니다.", runnerId, l))
                 .then();
-    }
-
-    private void logResult(Long runnerId, Long deletedCount) {
-        log.info("[DeleteImageService] 사용자 {}에 의해 이미지 {}개가 삭제되었습니다.", runnerId, deletedCount);
     }
 }
