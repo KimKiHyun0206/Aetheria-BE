@@ -14,7 +14,4 @@ public record ImageMetadataSaveDto(
         Shape shape,
         Proficiency proficiency
 ) {
-    public ImageMetadata toEntity() {
-        return ImageMetadata.toEntity(runnerId, location, shape, proficiency);
-    }
 }
