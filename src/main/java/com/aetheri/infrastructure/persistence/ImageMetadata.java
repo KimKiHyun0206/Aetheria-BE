@@ -11,7 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.UUID;
 
-@Table("image")
+@Table("image_metadata")
 @Getter
 @NoArgsConstructor
 public class ImageMetadata {

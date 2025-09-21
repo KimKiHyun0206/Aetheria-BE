@@ -19,7 +19,7 @@ CREATE TABLE kakao_token
     PRIMARY KEY (id)
 );
 
-CREATE TABLE image
+CREATE TABLE image_metadata
 (
     id          BIGINT PRIMARY KEY AUTO_INCREMENT,
     runner_id   BIGINT,
