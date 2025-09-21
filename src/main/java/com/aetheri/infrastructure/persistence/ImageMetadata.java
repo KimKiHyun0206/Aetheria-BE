@@ -9,10 +9,12 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.UUID;
+
 @Table("image")
 @Getter
 @NoArgsConstructor
-public class Image {
+public class ImageMetadata {
     @Id
     @Column("id")
     private Long id;
@@ -39,7 +41,7 @@ public class Image {
     private Boolean shared;
 
     @Builder
-    private Image(Long runnerId, String imagePath, String description, String location, Shape shape, Proficiency proficiency) {
+    private ImageMetadata(Long runnerId, String imagePath, String description, String location, Shape shape, Proficiency proficiency) {
         this.runnerId = runnerId;
         this.imagePath = imagePath;
         this.description = description;
@@ -48,11 +50,11 @@ public class Image {
         this.proficiency = proficiency;
     }
 
-    public static Image toEntity(Long runnerId, String imagePath, String description, String location, Shape shape, Proficiency proficiency) {
-        return Image.builder()
+    public static ImageMetadata toEntity(Long runnerId, String location, Shape shape, Proficiency proficiency) {
+        return ImageMetadata.builder()
                 .runnerId(runnerId)
-                .imagePath(imagePath)
-                .description(description)
+                .imagePath(runnerId + "-" + UUID.randomUUID())
+                .description("설명을 추가해주세요")
                 .location(location)
                 .shape(shape)
                 .proficiency(proficiency)
