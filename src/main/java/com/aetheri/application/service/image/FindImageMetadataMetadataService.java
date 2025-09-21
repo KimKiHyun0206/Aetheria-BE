@@ -25,6 +25,9 @@ public class FindImageMetadataMetadataService implements FindImageMetadataUseCas
 
     @Override
     public Flux<ImageMetadataResponse> findImageByRunnerId(Long runnerId) {
-        return null;
+        return imageMetadataRepositoryR2DbcAdapter.findByRunnerId(runnerId).map(imageMetadata -> {
+            log.info("[FindImageService] 사용자 {}의 이미지를 조회했습니다.", runnerId);
+            return imageMetadata.toResponse();
+        });
     }
 }
