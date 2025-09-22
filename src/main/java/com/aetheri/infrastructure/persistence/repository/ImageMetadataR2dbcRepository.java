@@ -1,4 +1,4 @@
-package com.aetheri.domain.adapter.out.r2dbc.spi;
+package com.aetheri.infrastructure.persistence.repository;
 
 import com.aetheri.infrastructure.persistence.entity.ImageMetadata;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;

@@ -3,7 +3,7 @@ package com.aetheri.domain.adapter.out.r2dbc;
 import com.aetheri.application.dto.image.ImageMetadataSaveDto;
 import com.aetheri.application.dto.image.ImageMetadataUpdateRequest;
 import com.aetheri.application.port.out.image.ImageRepositoryPort;
-import com.aetheri.domain.adapter.out.r2dbc.spi.ImageMetadataR2dbcRepository;
+import com.aetheri.infrastructure.persistence.repository.ImageMetadataR2dbcRepository;
 import com.aetheri.infrastructure.config.properties.ImageProperties;
 import com.aetheri.infrastructure.persistence.entity.ImageMetadata;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
