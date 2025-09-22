@@ -70,14 +70,15 @@ public class ImageMetadataHandler {
                 .flatMap(requestId ->
                         request.bodyToMono(ImageMetadataSaveRequest.class)
                                 .flatMap(dto -> saveImageMetadataUseCase.saveImageMetadata(requestId, dto))
-                ).flatMap(image -> ServerResponse.ok().bodyValue(image));
+                )
+                .then(ServerResponse.ok().bodyValue(null));
     }
 
     public Mono<ServerResponse> deleteImage(ServerRequest request) {
         Long imageId = Long.parseLong(request.pathVariable("imageId"));
         return AuthenticationUtils.extractRunnerIdFromRequest(request)
                 .flatMap(runnerId -> deleteImageMetadataUseCase.deleteImageMetadata(runnerId, imageId))
-                .flatMap(image -> ServerResponse.ok().bodyValue(image));
+                .then(ServerResponse.ok().bodyValue(null));
     }
 
     public Mono<ServerResponse> updateImage(ServerRequest request) {
@@ -87,6 +88,6 @@ public class ImageMetadataHandler {
                         request.bodyToMono(ImageMetadataUpdateRequest.class)
                                 .flatMap(dto -> updateImageMetadataUseCase.updateImageMetadata(runnerId, imageId, dto))
                 )
-                .flatMap(image -> ServerResponse.ok().bodyValue(image));
+                .then(ServerResponse.ok().bodyValue(null));
     }
 }
