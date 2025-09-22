@@ -10,8 +10,8 @@ import org.springframework.http.codec.json.Jackson2JsonEncoder;
 @Configuration
 public class DataStreamConfig {
     @Bean
-    public Jackson2JsonEncoder jackson2JsonEncoder() {
-        return new Jackson2JsonEncoder(new ObjectMapper(), MediaType.APPLICATION_JSON);
+    public Jackson2JsonEncoder jackson2JsonEncoder(ObjectMapper objectMapper) {
+        return new Jackson2JsonEncoder(objectMapper, MediaType.APPLICATION_JSON);
     }
 
     @Bean
