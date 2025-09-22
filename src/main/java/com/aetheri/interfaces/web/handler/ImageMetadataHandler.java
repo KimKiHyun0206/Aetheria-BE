@@ -77,6 +77,7 @@ public class ImageMetadataHandler {
     public Mono<ServerResponse> deleteImage(ServerRequest request) {
         Long imageId = Long.parseLong(request.pathVariable("imageId"));
         return AuthenticationUtils.extractRunnerIdFromRequest(request)
+                .switchIfEmpty(Mono.error(new BusinessException(ErrorMessage.FORBIDDEN, "유효한 인증 없이 접근할 수 없습니다.")))
                 .flatMap(runnerId -> deleteImageMetadataUseCase.deleteImageMetadata(runnerId, imageId))
                 .then(ServerResponse.ok().bodyValue(null));
     }
@@ -84,6 +85,7 @@ public class ImageMetadataHandler {
     public Mono<ServerResponse> updateImage(ServerRequest request) {
         Long imageId = Long.parseLong(request.pathVariable("imageId"));
         return AuthenticationUtils.extractRunnerIdFromRequest(request)
+                .switchIfEmpty(Mono.error(new BusinessException(ErrorMessage.FORBIDDEN, "유효한 인증 없이 접근할 수 없습니다.")))
                 .flatMap(runnerId ->
                         request.bodyToMono(ImageMetadataUpdateRequest.class)
                                 .flatMap(dto -> updateImageMetadataUseCase.updateImageMetadata(runnerId, imageId, dto))
