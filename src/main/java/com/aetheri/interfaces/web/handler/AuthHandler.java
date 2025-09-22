@@ -1,8 +1,8 @@
 package com.aetheri.interfaces.web.handler;
 
-import com.aetheri.application.service.sign.SignInService;
-import com.aetheri.application.service.sign.SignOffService;
-import com.aetheri.application.service.sign.SignOutService;
+import com.aetheri.application.port.in.sign.SignInUseCase;
+import com.aetheri.application.port.in.sign.SignOffUseCase;
+import com.aetheri.application.port.in.sign.SignOutUseCase;
 import com.aetheri.application.util.AuthenticationUtils;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
@@ -21,19 +21,25 @@ import java.net.URI;
 @Slf4j
 @Component
 public class AuthHandler {
-    private final SignInService signInService;
-    private final SignOffService signOffService;
-    private final SignOutService signOutService;
+    private final SignInUseCase signInUseCase;
+    private final SignOffUseCase signOffUseCase;
+    private final SignOutUseCase signOutUseCase;
 
     private final String clientId;
     private final String redirectUri;
     private final String refreshTokenCookie;
     private final String accessTokenHeader;
 
-    public AuthHandler(SignInService signInService, SignOffService signOffService, SignOutService signOutService, KakaoProperties kakaoProperties, JWTProperties jwtProperties) {
-        this.signInService = signInService;
-        this.signOffService = signOffService;
-        this.signOutService = signOutService;
+    public AuthHandler(
+            SignInUseCase signInUseCase,
+            SignOffUseCase signOffUseCase,
+            SignOutUseCase signOutUseCase,
+            KakaoProperties kakaoProperties,
+            JWTProperties jwtProperties
+    ) {
+        this.signInUseCase = signInUseCase;
+        this.signOffUseCase = signOffUseCase;
+        this.signOutUseCase = signOutUseCase;
         this.clientId = kakaoProperties.clientId();
         this.redirectUri = kakaoProperties.redirectUri();
         this.refreshTokenCookie = jwtProperties.refreshTokenCookie();
@@ -60,7 +66,7 @@ public class AuthHandler {
     public Mono<ServerResponse> getKakaoAccessToken(ServerRequest request) {
 
         return findCodeFromUrl(request)
-                .flatMap(signInService::login)
+                .flatMap(signInUseCase::signIn)
                 .flatMap(response -> {
                     log.info("[AuthHandler] 로그인 성공: \naccessToken={} \n refreshToken={}", response.accessToken(), response.refreshToken());
 
@@ -84,7 +90,7 @@ public class AuthHandler {
         return AuthenticationUtils.extractRunnerIdFromRequest(request)
                 .flatMap(runnerId -> {
                     log.info("[AuthHandler] signOff: runnerId={}", runnerId);
-                    return signOffService.signOff(runnerId).then(ServerResponse.noContent().build());
+                    return signOffUseCase.signOff(runnerId).then(ServerResponse.noContent().build());
                 });
     }
 
@@ -92,7 +98,7 @@ public class AuthHandler {
         return AuthenticationUtils.extractRunnerIdFromRequest(request)
                 .flatMap(runnerId -> {
                     log.info("[AuthHandler] signOut: runnerId={}", runnerId);
-                    return signOutService.signOut(runnerId).then(ServerResponse.noContent().build());
+                    return signOutUseCase.signOut(runnerId).then(ServerResponse.noContent().build());
                 });
     }
 

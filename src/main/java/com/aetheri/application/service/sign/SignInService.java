@@ -3,6 +3,7 @@ package com.aetheri.application.service.sign;
 import com.aetheri.application.dto.KakaoTokenResponse;
 import com.aetheri.application.dto.SignInResponse;
 import com.aetheri.application.dto.jwt.RefreshTokenIssueResponse;
+import com.aetheri.application.port.in.sign.SignInUseCase;
 import com.aetheri.application.port.out.jwt.JwtTokenProviderPort;
 import com.aetheri.application.port.out.kakao.KakaoGetAccessTokenPort;
 import com.aetheri.application.port.out.kakao.KakaoUserInformationInquiryPort;
@@ -25,7 +26,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
-public class SignInService {
+public class SignInService implements SignInUseCase {
     private final KakaoGetAccessTokenPort kakaoGetAccessTokenPort;
     private final KakaoUserInformationInquiryPort kakaoUserInformationInquiryPort;
     private final RunnerRepositoryPort runnerRepositoryPort;
@@ -60,7 +61,8 @@ public class SignInService {
      *
      * @param code 카카오가 발급한 로그인 코드
      */
-    public Mono<SignInResponse> login(String code) {
+    @Override
+    public Mono<SignInResponse> signIn(String code) {
                 // 코드가 유효한지 검증합니다.
         return validateCode(code)
                 // 카카오에서 액세스 토큰을 가져옵니다.

@@ -9,6 +9,7 @@ import com.aetheri.infrastructure.config.properties.JWTProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
@@ -54,6 +55,8 @@ public class SecurityConfig {
                                 "/api-docs/**"
                         ).permitAll()
                         .pathMatchers("/api/hello/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/v1/image").authenticated()  // SSE 이미지 스트리밍을 사용한 전체 조회
+                        .pathMatchers(HttpMethod.GET, "/api/v1/image/**").permitAll()   // 이미지 단건 조회
                         .pathMatchers("/api/v1/auth/authorization/kakao", "/api/v1/auth/sign-in", "/login/oauth2/code/kakao").permitAll()
                         // 위에 명시된 경로를 제외한 모든 요청은 인증된 사용자만 접근할 수 있다.
                         .anyExchange().authenticated()

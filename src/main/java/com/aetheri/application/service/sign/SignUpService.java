@@ -1,9 +1,10 @@
 package com.aetheri.application.service.sign;
 
+import com.aetheri.application.port.in.sign.SignUpUseCase;
 import com.aetheri.application.port.out.r2dbc.RunnerRepositoryPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
-import com.aetheri.infrastructure.persistence.Runner;
+import com.aetheri.infrastructure.persistence.entity.Runner;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SignUpService {
+public class SignUpService implements SignUpUseCase {
     private final RunnerRepositoryPort runnerRepositoryPort;
 
     /**
@@ -26,6 +27,7 @@ public class SignUpService {
      * @implNote Void로 반환하는 이유는 회원가입하고 난 엔티티를 비즈니스 로직에서 다시 사용하지 않을 것이기 때문.
      * @implNote then을 사용하는 이유는 {@code Mono<Runner>}를 {@code Mono<Void>}로 변환하기 위함임.
      */
+    @Override
     public Mono<Void> signUp(Long id, String name) {
                 // 카카오 ID로 사용자가 존재하는지 확인
         return existsByKakaoId(id)

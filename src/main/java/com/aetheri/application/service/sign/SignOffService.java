@@ -1,6 +1,7 @@
 package com.aetheri.application.service.sign;
 
 import com.aetheri.application.dto.KakaoTokenResponse;
+import com.aetheri.application.port.in.sign.SignOffUseCase;
 import com.aetheri.application.port.out.kakao.KakaoRefreshTokenPort;
 import com.aetheri.application.port.out.kakao.KakaoUnlinkPort;
 import com.aetheri.application.port.out.r2dbc.KakaoTokenRepositoryPort;
@@ -8,7 +9,7 @@ import com.aetheri.application.port.out.r2dbc.RunnerRepositoryPort;
 import com.aetheri.application.port.out.redis.RedisRefreshTokenRepositoryPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
-import com.aetheri.infrastructure.persistence.KakaoToken;
+import com.aetheri.infrastructure.persistence.entity.KakaoToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SignOffService {
+public class SignOffService implements SignOffUseCase {
     private final KakaoTokenRepositoryPort kakaoTokenRepositoryPort;
     private final KakaoUnlinkPort kakaoUnlinkPort;
     private final KakaoRefreshTokenPort kakaoRefreshTokenPort;
@@ -32,6 +33,7 @@ public class SignOffService {
      *
      * @param runnerId 사용자 ID
      */
+    @Override
     public Mono<Void> signOff(Long runnerId) {
                 // 데이터베이스에서 사용자 ID로 카카오 토큰을 찾습니다.
         return findKakaoToken(runnerId)

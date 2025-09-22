@@ -1,4 +1,4 @@
-package com.aetheri.infrastructure.persistence;
+package com.aetheri.infrastructure.persistence.entity;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -18,10 +18,10 @@ public class KakaoToken {
     @Column("runner_id")
     private Long runnerId;
 
-    @Column("accessToken")
+    @Column("access_token")
     private String accessToken;
 
-    @Column("refreshToken")
+    @Column("refresh_token")
     private String refreshToken;
 
     @Builder

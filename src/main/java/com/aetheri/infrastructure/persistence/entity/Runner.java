@@ -1,4 +1,4 @@
-package com.aetheri.infrastructure.persistence;
+package com.aetheri.infrastructure.persistence.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

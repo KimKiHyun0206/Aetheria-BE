@@ -1,6 +1,6 @@
 package com.aetheri.application.port.out.r2dbc;
 
-import com.aetheri.infrastructure.persistence.Runner;
+import com.aetheri.infrastructure.persistence.entity.Runner;
 import reactor.core.publisher.Mono;
 
 /**
