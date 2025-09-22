@@ -17,18 +17,16 @@ public class DeleteImageMetadataService implements DeleteImageMetadataUseCase {
 
     @Override
     public Mono<Void> deleteImageMetadata(Long runnerId, Long imageId) {
-        return imageMetadataRepositoryR2DbcAdapter.isExistImageMetadata(imageId)
-                .flatMap(isExist -> {
-                    if (isExist) return imageMetadataRepositoryR2DbcAdapter.deleteById(runnerId, imageId);
-
-                    return Mono.error(
-                            new BusinessException(
-                                    ErrorMessage.NOT_FOUND_IMAGE_METADATA,
-                                    "요청한 이미지 메타데이터를 찾지 못해 삭제하지 못했습니다."
-                            )
-                    );
-                })
-                .doOnSuccess(l -> log.info("[DeleteImageService] 사용자 {}에 의해 이미지 {}개가 삭제되었습니다.", runnerId, l))
-                .then();
+        return imageMetadataRepositoryR2DbcAdapter.deleteById(runnerId, imageId)
+                .flatMap(deletedCount -> {
+                    if (deletedCount == 0) {
+                        return Mono.error(new BusinessException(
+                                ErrorMessage.NOT_FOUND_IMAGE_METADATA,
+                                "요청한 이미지 메타데이터를 찾지 못해 삭제하지 못했습니다."
+                        ));
+                    }
+                    log.info("[DeleteImageService] 사용자 {}에 의해 이미지 {}개가 삭제되었습니다.", runnerId, deletedCount);
+                    return Mono.empty();
+                });
     }
 }
