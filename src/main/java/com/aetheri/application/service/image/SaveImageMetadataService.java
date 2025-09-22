@@ -19,7 +19,7 @@ public class SaveImageMetadataService implements SaveImageMetadataUseCase {
     public Mono<Void> saveImageMetadata(Long runnerId, ImageMetadataSaveRequest request) {
         var imageMetadataSaveDto = new ImageMetadataSaveDto(runnerId, request.location(), request.shape(), request.proficiency());
         return imageMetadataRepositoryR2dbcAdapter.saveImageMetadata(imageMetadataSaveDto)
-                .doOnSuccess(l -> log.info("[SaveImageMetadataService] 사용자 {}가 이미지 {}개를 생성했습니다.", runnerId, l))
+                .doOnSuccess(l -> log.info("[SaveImageMetadataService] 사용자 {}가 이미지 {}를 생성했습니다.", runnerId, l))
                 .then();
     }
 }
