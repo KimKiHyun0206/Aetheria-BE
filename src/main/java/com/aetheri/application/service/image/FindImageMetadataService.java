@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class FindImageMetadataMetadataService implements FindImageMetadataUseCase {
+public class FindImageMetadataService implements FindImageMetadataUseCase {
     private final ImageMetadataRepositoryR2dbcAdapter imageMetadataRepositoryR2DbcAdapter;
 
     @Override
