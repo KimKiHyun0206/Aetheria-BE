@@ -11,7 +11,6 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Table("image_metadata")
 @Getter
@@ -85,8 +84,8 @@ public class ImageMetadata {
                 this.title,
                 this.description,
                 this.location,
-                this.createdAt.toString(),
-                this.modifiedAt.toString()
+                this.createdAt,
+                this.modifiedAt
         );
     }
 }
