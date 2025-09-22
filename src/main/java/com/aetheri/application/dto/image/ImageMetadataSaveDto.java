@@ -2,7 +2,6 @@ package com.aetheri.application.dto.image;
 
 import com.aetheri.domain.enums.image.Proficiency;
 import com.aetheri.domain.enums.image.Shape;
-import com.aetheri.infrastructure.persistence.ImageMetadata;
 
 /**
  * 생성된 이미지의 메타데이터를 저장하기 위해 사용하는 DTO.

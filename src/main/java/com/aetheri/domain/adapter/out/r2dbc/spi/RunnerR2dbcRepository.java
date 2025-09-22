@@ -1,6 +1,6 @@
 package com.aetheri.domain.adapter.out.r2dbc.spi;
 
-import com.aetheri.infrastructure.persistence.Runner;
+import com.aetheri.infrastructure.persistence.entity.Runner;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import reactor.core.publisher.Mono;
 

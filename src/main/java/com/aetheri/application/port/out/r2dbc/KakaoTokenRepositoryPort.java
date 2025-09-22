@@ -1,6 +1,6 @@
 package com.aetheri.application.port.out.r2dbc;
 
-import com.aetheri.infrastructure.persistence.KakaoToken;
+import com.aetheri.infrastructure.persistence.entity.KakaoToken;
 import reactor.core.publisher.Mono;
 
 /**

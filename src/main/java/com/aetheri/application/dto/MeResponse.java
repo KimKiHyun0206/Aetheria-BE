@@ -1,6 +1,6 @@
 package com.aetheri.application.dto;
 
-import com.aetheri.infrastructure.persistence.Runner;
+import com.aetheri.infrastructure.persistence.entity.Runner;
 
 public record MeResponse(String name) {
     public static MeResponse of(Runner runner) {

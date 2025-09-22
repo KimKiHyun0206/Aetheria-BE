@@ -1,4 +1,4 @@
-package com.aetheri.infrastructure.persistence;
+package com.aetheri.infrastructure.persistence.entity;
 
 import com.aetheri.application.dto.image.ImageMetadataResponse;
 import com.aetheri.domain.enums.image.Proficiency;

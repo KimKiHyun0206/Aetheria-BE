@@ -5,7 +5,7 @@ import com.aetheri.application.port.in.image.FindImageMetadataUseCase;
 import com.aetheri.domain.adapter.out.r2dbc.ImageMetadataRepositoryR2dbcAdapter;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
-import com.aetheri.infrastructure.persistence.ImageMetadata;
+import com.aetheri.infrastructure.persistence.entity.ImageMetadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
