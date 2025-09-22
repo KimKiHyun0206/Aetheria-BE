@@ -27,11 +27,14 @@ CREATE TABLE image_metadata
     title       VARCHAR(255),
     description VARCHAR(255),
     location    VARCHAR(255),
-    shape       VARCHAR(255),
-    proficiency VARCHAR(255),
+    shape       ENUM ('CIRCLE', 'SQUARE', 'TRIANGLE', 'HEXAGON') NOT NULL,
+    proficiency ENUM ('BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT') NOT NULL,
     shared      BOOLEAN,
     created_at  DATE,
     modified_at DATE,
 
     CONSTRAINT fk_runner FOREIGN KEY (runner_id) REFERENCES runner (id)
 );
+
+-- 이미지 조회가 가능한지 테스트하기 위해 미리 삽입해주는 이미지 메타데이터
+INSERT INTO image_metadata VALUES (1, 1, 'sample_image.png', 'title1', 'description1', 'location1', 'shape1', 'proficiency1', false, '2021-01-01', '2021-01-01');
