@@ -8,6 +8,6 @@ import reactor.core.publisher.Mono;
  * 이미지 조회 유즈케이스
  * */
 public interface FindImageMetadataUseCase {
-    Mono<ImageMetadataResponse> findImageById(Long imageId);
-    Flux<ImageMetadataResponse> findImageByRunnerId(Long runnerId);
+    Mono<ImageMetadataResponse> findImageMetadataById(Long imageId);
+    Flux<ImageMetadataResponse> findImageMetadataByRunnerId(Long runnerId);
 }

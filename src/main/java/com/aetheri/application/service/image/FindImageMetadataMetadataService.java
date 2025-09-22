@@ -16,7 +16,7 @@ public class FindImageMetadataMetadataService implements FindImageMetadataUseCas
     private final ImageMetadataRepositoryR2dbcAdapter imageMetadataRepositoryR2DbcAdapter;
 
     @Override
-    public Mono<ImageMetadataResponse> findImageById(Long imageId) {
+    public Mono<ImageMetadataResponse> findImageMetadataById(Long imageId) {
         return imageMetadataRepositoryR2DbcAdapter.findById(imageId).map(imageMetadata -> {
             log.info("[FindImageService] 이미지 {}를 조회했습니다.", imageId);
             return imageMetadata.toResponse();
@@ -24,7 +24,7 @@ public class FindImageMetadataMetadataService implements FindImageMetadataUseCas
     }
 
     @Override
-    public Flux<ImageMetadataResponse> findImageByRunnerId(Long runnerId) {
+    public Flux<ImageMetadataResponse> findImageMetadataByRunnerId(Long runnerId) {
         return imageMetadataRepositoryR2DbcAdapter.findByRunnerId(runnerId).map(imageMetadata -> {
             log.info("[FindImageService] 사용자 {}의 이미지를 조회했습니다.", runnerId);
             return imageMetadata.toResponse();

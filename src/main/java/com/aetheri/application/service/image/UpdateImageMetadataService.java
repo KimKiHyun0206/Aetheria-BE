@@ -15,7 +15,7 @@ public class UpdateImageMetadataService implements UpdateImageMetadataUseCase {
     private final ImageMetadataRepositoryR2dbcAdapter imageMetadataRepositoryR2dbcAdapter;
 
     @Override
-    public Mono<Void> update(Long runnerId, Long imageId, ImageMetadataUpdateRequest request) {
+    public Mono<Void> updateImageMetadata(Long runnerId, Long imageId, ImageMetadataUpdateRequest request) {
         return imageMetadataRepositoryR2dbcAdapter.updateImageMetadata(runnerId, imageId, request)
                 .doOnSuccess(l -> log.info("[UpdateImageMetadataService] 사용자 {}가 이미지 {}의 메타데이터를 수정했습니다. 바뀐 행: {}", runnerId, imageId, l))
                 .then();

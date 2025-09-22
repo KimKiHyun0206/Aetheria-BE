@@ -65,10 +65,10 @@ public class ImageMetadata {
         this.modifiedAt = modifiedAt;
     }
 
-    public static ImageMetadata toEntity(Long runnerId, String location, Shape shape, Proficiency proficiency) {
+    public static ImageMetadata toEntity(Long runnerId, String imagePath, String location, Shape shape, Proficiency proficiency) {
         return ImageMetadata.builder()
                 .runnerId(runnerId)
-                .imagePath(runnerId + "-" + UUID.randomUUID())
+                .imagePath(imagePath)
                 .title(location + " " + shape.name())
                 .description("설명을 추가해주세요")
                 .location(location)

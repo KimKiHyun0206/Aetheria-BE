@@ -4,5 +4,5 @@ import com.aetheri.application.dto.image.ImageMetadataUpdateRequest;
 import reactor.core.publisher.Mono;
 
 public interface UpdateImageMetadataUseCase {
-    Mono<Void> update(Long runnerId, Long imageId, ImageMetadataUpdateRequest request);
+    Mono<Void> updateImageMetadata(Long runnerId, Long imageId, ImageMetadataUpdateRequest request);
 }
