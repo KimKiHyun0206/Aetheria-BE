@@ -37,4 +37,4 @@ CREATE TABLE image_metadata
 );
 
 -- 이미지 조회가 가능한지 테스트하기 위해 미리 삽입해주는 이미지 메타데이터
-INSERT INTO image_metadata VALUES (1, 1, 'sample_image.png', 'title1', 'description1', 'location1', 'shape1', 'proficiency1', false, '2021-01-01', '2021-01-01');
+INSERT INTO image_metadata VALUES (1, 1, 'sample_image.png', 'title1', 'description1', 'location1', 'CIRCLE', 'BEGINNER', false, '2021-01-01', '2021-01-01');
