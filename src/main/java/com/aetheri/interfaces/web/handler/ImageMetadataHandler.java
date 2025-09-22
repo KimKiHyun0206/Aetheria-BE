@@ -10,7 +10,6 @@ import com.aetheri.application.port.in.image.UpdateImageMetadataUseCase;
 import com.aetheri.application.util.AuthenticationUtils;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ResolvableType;
@@ -35,8 +34,8 @@ public class ImageMetadataHandler {
     private final DeleteImageMetadataUseCase deleteImageMetadataUseCase;
     private final SaveImageMetadataUseCase saveImageMetadataUseCase;
     private final UpdateImageMetadataUseCase updateImageMetadataUseCase;
-    private final Jackson2JsonEncoder encoder = new Jackson2JsonEncoder(new ObjectMapper(), MediaType.APPLICATION_JSON);
-    private final DefaultDataBufferFactory dataBufferFactory = new DefaultDataBufferFactory();
+    private final Jackson2JsonEncoder jackson2JsonEncoder;
+    private final DefaultDataBufferFactory dataBufferFactory;
     private final ResolvableType elementType = ResolvableType.forClass(ImageMetadataResponse.class);
 
 
@@ -51,7 +50,7 @@ public class ImageMetadataHandler {
     public Flux<ServerSentEvent<DataBuffer>> findImagesByRunnerId(ServerRequest request) {
         return AuthenticationUtils.extractRunnerIdFromRequest(request)
                 .flatMapMany(findImageMetadataUseCase::findImageMetadataByRunnerId)
-                .flatMap(response -> encoder.encode(
+                .flatMap(response -> jackson2JsonEncoder.encode(
                                 Flux.just(response),
                                 dataBufferFactory,
                                 elementType,
