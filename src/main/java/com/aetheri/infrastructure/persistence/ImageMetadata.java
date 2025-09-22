@@ -75,6 +75,7 @@ public class ImageMetadata {
                 .shape(shape)
                 .proficiency(proficiency)
                 .createdAt(LocalDate.now())
+                .shared(false)
                 .modifiedAt(LocalDate.now())
                 .build();
     }
