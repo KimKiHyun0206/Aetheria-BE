@@ -19,11 +19,10 @@ public class FindImageMetadataMetadataService implements FindImageMetadataUseCas
 
     @Override
     public Mono<ImageMetadataResponse> findImageMetadataById(Long runnerId, Long imageId) {
-        log.info("[FineImageService] findImageMetadataById({}, {})", runnerId, imageId);
         return imageMetadataRepositoryR2DbcAdapter.findById(imageId)
                 .switchIfEmpty(Mono.error(new BusinessException(ErrorMessage.NOT_FOUND_IMAGE_METADATA, "이미지를 찾을 수 없습니다.")))
                 .flatMap(imageMetadata -> {
-                    log.info("[FindImageService] 사용자 {}가 이미지 {}를 조회했습니다.", runnerId, imageId);
+                    log.info("[FindImageMetadataMetadataService] 사용자 {}가 이미지 {}를 조회했습니다.", runnerId, imageId);
                     if (imageMetadata.getShared() || imageMetadata.getRunnerId().equals(runnerId)) {
                         return Mono.just(imageMetadata.toResponse());
                     } else {
@@ -39,11 +38,10 @@ public class FindImageMetadataMetadataService implements FindImageMetadataUseCas
 
     @Override
     public Mono<ImageMetadataResponse> findImageMetadataById(Long imageId) {
-        log.info("[FineImageService] findImageMetadataById({})", imageId);
         return imageMetadataRepositoryR2DbcAdapter.findById(imageId)
                 .switchIfEmpty(Mono.error(new BusinessException(ErrorMessage.NOT_FOUND_IMAGE_METADATA, "이미지를 찾을 수 없습니다.")))
                 .flatMap(imageMetadata -> {
-                    log.info("[FindImageService] 이미지 {}를 조회했습니다.", imageId);
+                    log.info("[FindImageMetadataMetadataService] 이미지 {}를 조회했습니다.", imageId);
                     if (imageMetadata.getShared()) {
                         return Mono.just(imageMetadata.toResponse());
                     } else {
@@ -60,7 +58,7 @@ public class FindImageMetadataMetadataService implements FindImageMetadataUseCas
     @Override
     public Flux<ImageMetadataResponse> findImageMetadataByRunnerId(Long runnerId) {
         return imageMetadataRepositoryR2DbcAdapter.findByRunnerId(runnerId).map(imageMetadata -> {
-            log.info("[FindImageService] 사용자 {}의 이미지를 조회했습니다.", runnerId);
+            log.info("[FindImageMetadataMetadataService] 사용자 {}의 이미지를 조회했습니다.", runnerId);
             return imageMetadata.toResponse();
         });
     }
