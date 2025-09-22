@@ -1,11 +1,14 @@
 package com.aetheri.interfaces.web.router;
 
+import com.aetheri.application.dto.image.ImageMetadataSaveRequest;
+import com.aetheri.application.dto.image.ImageMetadataUpdateRequest;
 import com.aetheri.interfaces.web.handler.ImageMetadataHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.RouterOperation;
@@ -88,7 +91,6 @@ public class ImageMetadataRouter {
                             operationId = "updateImageById",
                             summary = "ID로 이미지 메타데이터를 업데이트합니다.",
                             parameters = {
-                                    // imageId를 pathVariable로 정의
                                     @Parameter(
                                             name = "imageId",
                                             in = ParameterIn.PATH,
@@ -96,6 +98,13 @@ public class ImageMetadataRouter {
                                             description = "업데이트할 이미지의 고유 ID"
                                     )
                             },
+                            requestBody = @RequestBody(
+                                    required = true,
+                                    description = "업데이트할 이미지 메타데이터",
+                                    content = @Content(
+                                            schema = @Schema(implementation = ImageMetadataUpdateRequest.class)
+                                    )
+                            ),
                             responses = {
                                     @ApiResponse(
                                             responseCode = "200",
@@ -113,6 +122,13 @@ public class ImageMetadataRouter {
                     operation = @Operation(
                             operationId = "saveImage",
                             summary = "새로운 이미지 메타데이터를 저장합니다.",
+                            requestBody = @RequestBody(
+                                    required = true,
+                                    description = "저장할 이미지 메타데이터",
+                                    content = @Content(
+                                            schema = @Schema(implementation = ImageMetadataSaveRequest.class)
+                                    )
+                            ),
                             responses = {
                                     @ApiResponse(
                                             responseCode = "200",
