@@ -1,5 +1,6 @@
 package com.aetheri.interfaces.web.router;
 
+import com.aetheri.application.dto.image.ImageMetadataResponse;
 import com.aetheri.application.dto.image.ImageMetadataSaveRequest;
 import com.aetheri.application.dto.image.ImageMetadataUpdateRequest;
 import com.aetheri.interfaces.web.handler.ImageMetadataHandler;
@@ -15,10 +16,14 @@ import org.springdoc.core.annotations.RouterOperation;
 import org.springdoc.core.annotations.RouterOperations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+
+import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 @Slf4j
 @Configuration
@@ -42,6 +47,27 @@ public class ImageMetadataRouter {
                                             description = "조회할 이미지의 고유 ID"
                                     )
                             },
+                            responses = {
+                                    @ApiResponse(
+                                            responseCode = "200",
+                                            description = "정상적으로 이미지 메타데이터를 반환합니다.",
+                                            content = @Content(schema = @Schema(implementation = String.class))
+                                    ),
+                                    @ApiResponse(
+                                            responseCode = "404",
+                                            description = "해당 ID의 이미지를 찾을 수 없습니다."
+                                    )
+                            }
+                    )
+            ),
+            @RouterOperation(
+                    path = "/api/v1/image",
+                    method = RequestMethod.GET,
+                    beanClass = ImageMetadataHandler.class,
+                    beanMethod = "findImagesByRunnerId",
+                    operation = @Operation(
+                            operationId = "findImagesByRunnerId",
+                            summary = "사용자 ID로 이미지 메타데이터를 조회합니다.",
                             responses = {
                                     @ApiResponse(
                                             responseCode = "200",
@@ -142,6 +168,10 @@ public class ImageMetadataRouter {
         return RouterFunctions.route()
                 .path("/api/v1/image", builder -> builder
                         .POST("", handler::saveImage)
+                        .GET("", request -> ServerResponse.ok()
+                                .contentType(MediaType.TEXT_EVENT_STREAM)
+                                .body(handler.findImagesByRunnerId(request), ServerSentEvent.class)
+                        )
                         .GET("/{imageId}", handler::findImage)
                         .DELETE("/{imageId}", handler::deleteImage)
                         .PUT("/{imageId}", handler::updateImage)
