@@ -28,7 +28,8 @@ public class AuthenticationUtils {
                                 ErrorMessage.JWT_SUBJECT_IS_NOT_NUMBER,
                                 "JWT subject가 숫자가 아닙니다."));
                     }
-                });
+                })
+                .switchIfEmpty(Mono.empty());
     }
 
     /**
