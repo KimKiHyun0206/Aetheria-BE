@@ -5,6 +5,7 @@ import com.aetheri.application.port.in.image.FindImageMetadataUseCase;
 import com.aetheri.domain.adapter.out.r2dbc.ImageMetadataRepositoryR2dbcAdapter;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
+import com.aetheri.infrastructure.persistence.ImageMetadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -57,9 +58,7 @@ public class FindImageMetadataMetadataService implements FindImageMetadataUseCas
 
     @Override
     public Flux<ImageMetadataResponse> findImageMetadataByRunnerId(Long runnerId) {
-        return imageMetadataRepositoryR2DbcAdapter.findByRunnerId(runnerId).map(imageMetadata -> {
-            log.info("[FindImageMetadataMetadataService] 사용자 {}의 이미지를 조회했습니다.", runnerId);
-            return imageMetadata.toResponse();
-        });
+        return imageMetadataRepositoryR2DbcAdapter.findByRunnerId(runnerId).map(ImageMetadata::toResponse)
+                .doOnComplete(() -> log.info("[FindImageMetadataMetadataService] 사용자 {}의 이미지를 조회했습니다.", runnerId));
     }
 }
