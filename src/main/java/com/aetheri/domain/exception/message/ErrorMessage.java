@@ -14,6 +14,7 @@ public enum ErrorMessage {
     // Server 에러
     INVALID_REQUEST_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 요청 입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "예기치 못한 에러가 발생했습니다"),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "유효하지 않은 접근입니다"),
 
     // 데이터베이스 커넥션 에러
     R2DBC_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 연결에 실패했습니다."),
@@ -39,6 +40,11 @@ public enum ErrorMessage {
     // 사용자,
     NOT_FOUND_RUNNER(HttpStatus.NOT_FOUND, "요청한 사용자를 찾지 못했습니다."),
     DUPLICATE_RUNNER(HttpStatus.CONFLICT, "중복된 사용자입니다."),
+
+
+    // 이미지 메타데이터
+    NOT_FOUND_IMAGE_METADATA(HttpStatus.NOT_FOUND, "이미지 메타데이터를 찾지 못했습니다."),
+    RUNNER_IS_NOT_OWNER_OF_IMAGE_METADATA(HttpStatus.FORBIDDEN, "이미지의 소유자가 아닙니다."),
 
 
     // 카카오 토큰(데이터베이스)
