@@ -2,7 +2,6 @@ package com.aetheri.application.service.image;
 
 import com.aetheri.application.port.in.image.DeleteImageMetadataUseCase;
 import com.aetheri.application.port.out.image.ImageRepositoryPort;
-import com.aetheri.domain.adapter.out.r2dbc.ImageMetadataRepositoryR2dbcAdapter;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,6 @@ import reactor.core.publisher.Mono;
 /**
  * 이미지 메타데이터를 삭제하기 위한 서비스
  *
- * @implNote DeleteImageMetadataUseCase 유즈케이스를 구현한다
  * @see DeleteImageMetadataUseCase 구현하는 유즈케이스
  * @see ImageRepositoryPort 데이터베이스에 접근하기 위해 접근하는 포트
  * */
@@ -23,6 +21,15 @@ import reactor.core.publisher.Mono;
 public class DeleteImageMetadataService implements DeleteImageMetadataUseCase {
     private final ImageRepositoryPort imageRepositoryPort;
 
+    /**
+     * 이미지 메타데이터를 삭제하기 위한 서비스 메소드
+     *
+     * @param runnerId 이미지 메타데이터 삭제를 요청한 사용자의 ID
+     * @param imageId 삭제 요청된 이미지 메타데이터의 ID
+     * @implSpec 만약 삭제된 행의 갯수가 0개라면 삭제되지 않았다고 판단하고 에러 응답
+     * @exception BusinessException 삿제된 행의 갯수가 0개일 때 에러 반환
+     * @return 아무런 정보도 응답하지 않는다.
+     * */
     @Override
     public Mono<Void> deleteImageMetadata(Long runnerId, Long imageId) {
         return imageRepositoryPort.deleteById(runnerId, imageId)
