@@ -1,6 +1,7 @@
 package com.aetheri.application.service.image;
 
 import com.aetheri.application.port.in.image.DeleteImageMetadataUseCase;
+import com.aetheri.application.port.out.image.ImageRepositoryPort;
 import com.aetheri.domain.adapter.out.r2dbc.ImageMetadataRepositoryR2dbcAdapter;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
@@ -9,15 +10,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+/**
+ * 이미지 메타데이터를 삭제하기 위한 서비스
+ *
+ * @implNote DeleteImageMetadataUseCase 유즈케이스를 구현한다
+ * @see DeleteImageMetadataUseCase 구현하는 유즈케이스
+ * @see ImageRepositoryPort 데이터베이스에 접근하기 위해 접근하는 포트
+ * */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DeleteImageMetadataService implements DeleteImageMetadataUseCase {
-    private final ImageMetadataRepositoryR2dbcAdapter imageMetadataRepositoryR2DbcAdapter;
+    private final ImageRepositoryPort imageRepositoryPort;
 
     @Override
     public Mono<Void> deleteImageMetadata(Long runnerId, Long imageId) {
-        return imageMetadataRepositoryR2DbcAdapter.deleteById(runnerId, imageId)
+        return imageRepositoryPort.deleteById(runnerId, imageId)
                 .flatMap(deletedCount -> {
                     if (deletedCount == 0) {
                         return Mono.error(new BusinessException(

@@ -2,7 +2,7 @@ package com.aetheri.application.service.image;
 
 import com.aetheri.application.dto.image.ImageMetadataResponse;
 import com.aetheri.application.port.in.image.FindImageMetadataUseCase;
-import com.aetheri.domain.adapter.out.r2dbc.ImageMetadataRepositoryR2dbcAdapter;
+import com.aetheri.application.port.out.image.ImageRepositoryPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
 import com.aetheri.infrastructure.persistence.entity.ImageMetadata;
@@ -16,11 +16,11 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class FindImageMetadataService implements FindImageMetadataUseCase {
-    private final ImageMetadataRepositoryR2dbcAdapter imageMetadataRepositoryR2DbcAdapter;
+    private final ImageRepositoryPort imageRepositoryPort;
 
     @Override
     public Mono<ImageMetadataResponse> findImageMetadataById(Long runnerId, Long imageId) {
-        return imageMetadataRepositoryR2DbcAdapter.findById(imageId)
+        return imageRepositoryPort.findById(imageId)
                 .switchIfEmpty(Mono.error(new BusinessException(ErrorMessage.NOT_FOUND_IMAGE_METADATA, "이미지를 찾을 수 없습니다.")))
                 .flatMap(imageMetadata -> {
                     log.info("[FindImageMetadataMetadataService] 사용자 {}가 이미지 {}를 조회했습니다.", runnerId, imageId);
@@ -39,7 +39,7 @@ public class FindImageMetadataService implements FindImageMetadataUseCase {
 
     @Override
     public Mono<ImageMetadataResponse> findImageMetadataById(Long imageId) {
-        return imageMetadataRepositoryR2DbcAdapter.findById(imageId)
+        return imageRepositoryPort.findById(imageId)
                 .switchIfEmpty(Mono.error(new BusinessException(ErrorMessage.NOT_FOUND_IMAGE_METADATA, "이미지를 찾을 수 없습니다.")))
                 .flatMap(imageMetadata -> {
                     log.info("[FindImageMetadataMetadataService] 이미지 {}를 조회했습니다.", imageId);
@@ -58,7 +58,7 @@ public class FindImageMetadataService implements FindImageMetadataUseCase {
 
     @Override
     public Flux<ImageMetadataResponse> findImageMetadataByRunnerId(Long runnerId) {
-        return imageMetadataRepositoryR2DbcAdapter.findByRunnerId(runnerId).map(ImageMetadata::toResponse)
+        return imageRepositoryPort.findByRunnerId(runnerId).map(ImageMetadata::toResponse)
                 .doOnComplete(() -> log.info("[FindImageMetadataMetadataService] 사용자 {}의 이미지를 조회했습니다.", runnerId));
     }
 }
