@@ -21,13 +21,17 @@ public class UpdateImageMetadataService implements UpdateImageMetadataUseCase {
     private final ImageRepositoryPort imageRepositoryPort;
 
     /**
-     * 이미지 메타데이터를 수정하기 위한 메소드
-     * @implSpec 사용자의 것이 아니면 수정할 수 없도록 두현함
-     * @param runnerId 수정을 요천한 사용자의 ID
-     * @param imageId 수정 요청된 이미지 메타데이터의 ID
-     * @param request 수정 요청
-     * @return 아무런 정보도 응답하지 않는다.
-     * */
+     * Update metadata for an image.
+     *
+     * <p>Only the owner of the image (the requesting user) is allowed to perform this update;
+     * this method delegates authorization/enforcement to the underlying repository/port.
+     *
+     * @param runnerId the ID of the user requesting the update
+     * @param imageId  the ID of the image whose metadata will be updated
+     * @param request  the metadata update payload
+     * @return a Mono that completes when the update finishes; it emits no value
+     *         (errors from the repository call propagate through the returned Mono)
+     */
     @Override
     public Mono<Void> updateImageMetadata(Long runnerId, Long imageId, ImageMetadataUpdateRequest request) {
         return imageRepositoryPort.updateImageMetadata(runnerId, imageId, request)

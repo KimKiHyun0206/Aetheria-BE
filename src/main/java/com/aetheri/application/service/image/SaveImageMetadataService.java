@@ -22,12 +22,16 @@ public class SaveImageMetadataService implements SaveImageMetadataUseCase {
     private final ImageRepositoryPort imageRepositoryPort;
 
     /**
-     * 이미지 메타데이터를 생성하기 위한 메소드
-     * @implSpec 받아오지 않는 값은 자동으로 기본적인 값을 가진 항목들이다.
-     * @param runnerId 이미지 메타데이터를 생성한 사용자의 ID
-     * @param request 이미지 메타데이터 생성 요청
-     * @return 아무런 정보도 응답하지 않는다.
-     * */
+     * Persist image metadata for the given runner.
+     *
+     * Builds an ImageMetadataSaveDto from the provided runnerId and request and delegates persistence
+     * to the image repository port. The returned Mono completes when the save operation succeeds;
+     * any errors from the repository are propagated downstream.
+     *
+     * @param runnerId the ID of the user creating the image metadata
+     * @param request  request containing metadata fields (location, shape, proficiency)
+     * @return a Mono that completes when the metadata has been persisted
+     */
     @Override
     public Mono<Void> saveImageMetadata(Long runnerId, ImageMetadataSaveRequest request) {
         var imageMetadataSaveDto = new ImageMetadataSaveDto(

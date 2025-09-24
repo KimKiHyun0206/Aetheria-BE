@@ -7,11 +7,15 @@ import reactor.core.publisher.Mono;
  * */
 public interface DeleteImageMetadataUseCase {
     /**
-     * 이미지 메타데이터를 삭제할 수 있는 메소드
-     *
-     * @param imageId 삭제할 이미지의 ID
-     * @param runnerId 이미지를 삭제할 사용자의 ID
-     * @return 삭제하므로 Void를 리턴한다
-     * */
+ * Delete image metadata for a given user.
+ *
+ * <p>Deletes the metadata for the image identified by {@code imageId} on behalf of the user
+ * identified by {@code runnerId}. The returned {@code Mono} completes when the deletion
+ * operation has finished.</p>
+ *
+ * @param runnerId ID of the user requesting the deletion
+ * @param imageId  ID of the image whose metadata should be deleted
+ * @return a {@code Mono<Void>} that completes when the metadata deletion is finished
+ */
     Mono<Void> deleteImageMetadata(Long runnerId, Long imageId);
 }

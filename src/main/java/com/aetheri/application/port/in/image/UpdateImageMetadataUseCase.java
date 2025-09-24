@@ -8,13 +8,15 @@ import reactor.core.publisher.Mono;
  * */
 public interface UpdateImageMetadataUseCase {
     /**
-     * 이미지 메타데이터를 수정하기 위한 메소드
-     *
-     * @param runnerId 수정을 요청한 사용자의 ID
-     * @param imageId 수정될 이미지 메타데이터의 ID
-     * @param request 수정할 정보가 담긴 DTO
-     * @implSpec 만약 사용자의 ID와 이미지 메타데이터의 소유자 ID가 다르면 수정할 수 없어야 한다.
-     * @return 수정된 정보를 반환하지 않기에 Void를 반환한다.
-     * */
+ * Updates metadata for an existing image.
+ *
+ * <p>Applies the changes provided in {@code request} to the image metadata identified by
+ * {@code imageId} only if {@code runnerId} is the owner of that metadata.
+ *
+ * @param runnerId ID of the user requesting the update; must match the image metadata owner for the update to be applied
+ * @param imageId ID of the image metadata to update
+ * @param request DTO containing the metadata fields to update
+ * @return a {@code Mono<Void>} that completes when the update has been applied (no value emitted)
+ */
     Mono<Void> updateImageMetadata(Long runnerId, Long imageId, ImageMetadataUpdateRequest request);
 }
