@@ -25,14 +25,15 @@ public class FindImageMetadataService implements FindImageMetadataUseCase {
     private final ImageRepositoryPort imageRepositoryPort;
 
     /**
-     * 이미지 메타데이터를 조회하기 위한 메소드
+     * Retrieve image metadata by image ID for a requesting runner.
      *
-     * @implSpec 사용자 ID를 포함한 요청일 때 이 메소드를 사용한다.
-     * @param runnerId 이미지 메타데이터 조회를 요청한 사용자의 ID
-     * @param imageId 조회 요청된 이미지 메타데이터의 ID
-     * @return 이미지 메타데이터를 응답하는 DTO
-     * @exception BusinessException 이미지 메타데이터를 찾지 못했을 때 에러 반환
-     * */
+     * Returns the image metadata wrapped in a Mono if the image exists and the requester is allowed to access it.
+     * Access is permitted when the image is shared or when the requesting runner is the image owner.
+     *
+     * @param runnerId the ID of the runner requesting the metadata (used for ownership check)
+     * @param imageId  the ID of the image metadata to retrieve
+     * @return a Mono emitting the ImageMetadataResponse when authorized and the metadata exists; otherwise the Mono completes with an error
+     */
     @Override
     public Mono<ImageMetadataResponse> findImageMetadataById(Long runnerId, Long imageId) {
         return imageRepositoryPort.findById(imageId)
@@ -53,13 +54,15 @@ public class FindImageMetadataService implements FindImageMetadataUseCase {
     }
 
     /**
-     * 이미지 메타데이터를 조회하기 위한 메소드
+     * Retrieve image metadata by ID for requests without a requester (no runnerId).
      *
-     * @implSpec 사용자 ID를 포함하지 않은 요청일 때 이 메소드를 사용한다.
-     * @param imageId 조회 요청된 이미지 메타데이터의 ID
-     * @return 이미지 메타데이터를 응답하는 DTO
-     * @exception BusinessException 이미지 메타데이터를 찾지 못했을 때 에러 반환
-     * */
+     * Returns the image metadata wrapped in a Mono if the image exists and is shared.
+     *
+     * @param imageId the ID of the image metadata to retrieve
+     * @return a Mono emitting the ImageMetadataResponse when allowed
+     * @throws BusinessException with ErrorMessage.NOT_FOUND_IMAGE_METADATA if no image is found
+     * @throws BusinessException with ErrorMessage.RUNNER_IS_NOT_OWNER_OF_IMAGE_METADATA if the image exists but is not shared
+     */
     @Override
     public Mono<ImageMetadataResponse> findImageMetadataById(Long imageId) {
         return imageRepositoryPort.findById(imageId)
@@ -79,6 +82,14 @@ public class FindImageMetadataService implements FindImageMetadataUseCase {
                 });
     }
 
+    /**
+     * Retrieves all image metadata belonging to the given runner.
+     *
+     * Returns a reactive stream of ImageMetadataResponse objects for the runner identified by {@code runnerId}.
+     *
+     * @param runnerId ID of the runner whose image metadata should be returned
+     * @return a Flux that emits the runner's image metadata responses
+     */
     @Override
     public Flux<ImageMetadataResponse> findImageMetadataByRunnerId(Long runnerId) {
         return imageRepositoryPort.findByRunnerId(runnerId).map(ImageMetadata::toResponse)

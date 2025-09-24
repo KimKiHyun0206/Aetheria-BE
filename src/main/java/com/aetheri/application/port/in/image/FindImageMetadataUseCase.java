@@ -9,31 +9,35 @@ import reactor.core.publisher.Mono;
  */
 public interface FindImageMetadataUseCase {
     /**
-     * 사용자의 ID와 이미지의 ID로 메타데이터를 찾을 수 있는 메소드
-     *
-     * @param imageId  조회할 이미지 메타데이터의 ID
-     * @param runnerId 조회를 요청한 사용자의 ID
-     * @implSpec 요청자가 이미지 메타데이터의 소유자인지 검사한다,
-     * @return 이미지 메타데이터 정보를 가진 DTO
-     */
+ * Retrieve image metadata by image ID for a specific requesting user.
+ *
+ * <p>Returns the metadata only if the requester (runnerId) is the owner of the image.
+ *
+ * @param runnerId ID of the user requesting the metadata (used for ownership check)
+ * @param imageId  ID of the image metadata to retrieve
+ * @return a Mono emitting the ImageMetadataResponse when the requester is the image owner
+ */
     Mono<ImageMetadataResponse> findImageMetadataById(Long runnerId, Long imageId);
 
     /**
-     * 이미지의 ID로 메타데이터를 찾을 수 있는 메소드
-     *
-     * @param imageId 조회할 이미지 메타데이터의 ID
-     * @implSpec 요청자의 인증이 없이도 이미지 메타데이터를 조죄할 수 있다.
-     *           하지만 이미지 메타데이터의 상태가 공유되지 않았따면 조회할 수 없다.
-     * @return 이미지 메타데이터의 정보를 가진 DTO
-     */
+ * 이미지 ID로 이미지 메타데이터를 조회한다.
+ *
+ * <p>인증 없이 호출할 수 있으나, 해당 메타데이터가 공유되지 않은 경우 조회가 허용되지 않는다.</p>
+ *
+ * @param imageId 조회할 이미지 메타데이터의 ID
+ * @return 이미지 메타데이터를 담은 {@code Mono<ImageMetadataResponse>}
+ * @implSpec 요청자 인증 없이 호출 가능하되, 메타데이터의 공개/공유 상태에 따라 조회 가능 여부가 결정된다.
+ */
     Mono<ImageMetadataResponse> findImageMetadataById(Long imageId);
 
     /**
-     * 사용자의 ID로 이미지 메타데이트롤 찾을 수 있는 메소드
-     *
-     * @param runnerId 이미지 메타데이터를 가진 사용자의 ID
-     * @implSpec FLux로 반환하고 이는 SSE 로 클라이언트로 응답하게 된다.
-     * @return 이미지 메타데이터의 정보를 가진 DTO
-     * */
+ * Retrieve all image metadata owned by the specified runner.
+ *
+ * Returns a stream of ImageMetadataResponse DTOs for the given runner ID.
+ *
+ * @param runnerId ID of the runner whose image metadata will be returned
+ * @return a Flux that emits ImageMetadataResponse objects owned by the runner
+ * @implSpec The results are returned as a Reactor Flux and are intended to be delivered to clients via Server-Sent Events (SSE).
+ */
     Flux<ImageMetadataResponse> findImageMetadataByRunnerId(Long runnerId);
 }
