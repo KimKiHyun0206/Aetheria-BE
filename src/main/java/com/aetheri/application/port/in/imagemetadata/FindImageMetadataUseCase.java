@@ -1,4 +1,4 @@
-package com.aetheri.application.port.in.image;
+package com.aetheri.application.port.in.imagemetadata;
 
 import com.aetheri.application.dto.image.ImageMetadataResponse;
 import reactor.core.publisher.Flux;

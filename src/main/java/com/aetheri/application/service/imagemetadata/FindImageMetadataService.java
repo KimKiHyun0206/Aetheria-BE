@@ -1,7 +1,7 @@
-package com.aetheri.application.service.image;
+package com.aetheri.application.service.imagemetadata;
 
 import com.aetheri.application.dto.image.ImageMetadataResponse;
-import com.aetheri.application.port.in.image.FindImageMetadataUseCase;
+import com.aetheri.application.port.in.imagemetadata.FindImageMetadataUseCase;
 import com.aetheri.application.port.out.image.ImageRepositoryPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
