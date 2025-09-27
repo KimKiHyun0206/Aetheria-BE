@@ -46,6 +46,9 @@ public enum ErrorMessage {
     NOT_FOUND_IMAGE_METADATA(HttpStatus.NOT_FOUND, "이미지 메타데이터를 찾지 못했습니다."),
     RUNNER_IS_NOT_OWNER_OF_IMAGE_METADATA(HttpStatus.FORBIDDEN, "이미지의 소유자가 아닙니다."),
 
+    // 이미지
+    INVALID_IMAGE_PATH(HttpStatus.NOT_FOUND, "유효한 이미지 경로가 아닙니다."),
+    NOT_FOUND_IMAGE(HttpStatus.NOT_FOUND, "이미지를 조회하지 못했습니다."),
 
     // 카카오 토큰(데이터베이스)
     NOT_FOUND_KAKAO_TOKEN(HttpStatus.NOT_FOUND, "카카오 토큰을 데이터베이스에서 찾을 수 없습니다"),
