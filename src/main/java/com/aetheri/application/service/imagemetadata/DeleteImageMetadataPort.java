@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DeleteImageMetadataService implements DeleteImageMetadataUseCase {
+public class DeleteImageMetadataPort implements DeleteImageMetadataUseCase {
     private final ImageRepositoryPort imageRepositoryPort;
 
     /**

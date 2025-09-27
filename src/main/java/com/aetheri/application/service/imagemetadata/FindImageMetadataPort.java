@@ -15,13 +15,13 @@ import reactor.core.publisher.Mono;
 /**
  * 이미지 메타데이터를 조회하기 위한 서비스
  *
- * @see FindImageMetadataService 구현하는 유즈케이스
+ * @see FindImageMetadataPort 구현하는 유즈케이스
  * @see ImageRepositoryPort 데이터베이스에 접근하기 위해 접근하는 포트
  * */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class FindImageMetadataService implements FindImageMetadataUseCase {
+public class FindImageMetadataPort implements FindImageMetadataUseCase {
     private final ImageRepositoryPort imageRepositoryPort;
 
     /**

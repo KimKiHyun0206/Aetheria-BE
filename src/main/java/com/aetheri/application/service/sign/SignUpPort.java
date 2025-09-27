@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SignUpService implements SignUpUseCase {
+public class SignUpPort implements SignUpUseCase {
     private final RunnerRepositoryPort runnerRepositoryPort;
 
     /**

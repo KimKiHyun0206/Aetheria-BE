@@ -26,24 +26,24 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
-public class SignInService implements SignInUseCase {
+public class SignInPort implements SignInUseCase {
     private final KakaoGetAccessTokenPort kakaoGetAccessTokenPort;
     private final KakaoUserInformationInquiryPort kakaoUserInformationInquiryPort;
     private final RunnerRepositoryPort runnerRepositoryPort;
     private final KakaoTokenRepositoryPort kakaoTokenRepositoryPort;
     private final RedisRefreshTokenRepositoryPort redisRefreshTokenRepositoryPort;
     private final JwtTokenProviderPort jwtTokenProviderPort;
-    private final SignUpService signUpService;
+    private final SignUpPort signUpPort;
 
     private final long REFRESH_TOKEN_EXPIRATION_DAYS;
 
-    public SignInService(
+    public SignInPort(
             KakaoGetAccessTokenPort kakaoGetAccessTokenPort,
             KakaoUserInformationInquiryPort kakaoUserInformationInquiryPort,
             RunnerRepositoryPort runnerRepositoryPort,
             KakaoTokenRepositoryPort kakaoTokenRepositoryPort, RedisRefreshTokenRepositoryPort redisRefreshTokenRepositoryPort,
             JwtTokenProviderPort jwtTokenProviderPort,
-            SignUpService signUpService,
+            SignUpPort signUpPort,
             JWTProperties jwtProperties
     ) {
         this.kakaoGetAccessTokenPort = kakaoGetAccessTokenPort;
@@ -52,7 +52,7 @@ public class SignInService implements SignInUseCase {
         this.kakaoTokenRepositoryPort = kakaoTokenRepositoryPort;
         this.redisRefreshTokenRepositoryPort = redisRefreshTokenRepositoryPort;
         this.jwtTokenProviderPort = jwtTokenProviderPort;
-        this.signUpService = signUpService;
+        this.signUpPort = signUpPort;
         this.REFRESH_TOKEN_EXPIRATION_DAYS = jwtProperties.refreshTokenExpirationDays();
     }
 
@@ -160,7 +160,7 @@ public class SignInService implements SignInUseCase {
         return runnerRepositoryPort.existsByKakaoId(dto.id())
                 .flatMap(exists -> exists ?
                         runnerRepositoryPort.findByKakaoId(dto.id()) :
-                        signUpService.signUp(dto.id(), dto.name())
+                        signUpPort.signUp(dto.id(), dto.name())
                                 .then(runnerRepositoryPort.findByKakaoId(dto.id()))
                 ).map(runner -> new KakaoTokenAndId(
                         dto.accessToken(),
