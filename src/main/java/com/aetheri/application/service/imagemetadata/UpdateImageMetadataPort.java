@@ -1,7 +1,7 @@
-package com.aetheri.application.service.image;
+package com.aetheri.application.service.imagemetadata;
 
 import com.aetheri.application.dto.image.ImageMetadataUpdateRequest;
-import com.aetheri.application.port.in.image.UpdateImageMetadataUseCase;
+import com.aetheri.application.port.in.imagemetadata.UpdateImageMetadataUseCase;
 import com.aetheri.application.port.out.image.ImageRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UpdateImageMetadataService implements UpdateImageMetadataUseCase {
+public class UpdateImageMetadataPort implements UpdateImageMetadataUseCase {
     private final ImageRepositoryPort imageRepositoryPort;
 
     /**

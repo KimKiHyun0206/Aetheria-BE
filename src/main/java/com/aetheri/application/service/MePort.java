@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
-public class MeService {
+public class MePort {
     private final RunnerRepositoryPort runnerRepositoryPort;
 
     public Mono<MeResponse> me(Long id) {

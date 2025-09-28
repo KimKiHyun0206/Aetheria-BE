@@ -84,6 +84,7 @@ public class ImageMetadata {
                 this.title,
                 this.description,
                 this.location,
+                this.imagePath,
                 this.createdAt,
                 this.modifiedAt
         );

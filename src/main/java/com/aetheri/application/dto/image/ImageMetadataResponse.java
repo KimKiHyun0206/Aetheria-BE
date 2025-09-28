@@ -6,6 +6,7 @@ public record ImageMetadataResponse(
         String title,
         String description,
         String location,
+        String imagePath,
         LocalDate createdAt,
         LocalDate modifiedAt
 ) {

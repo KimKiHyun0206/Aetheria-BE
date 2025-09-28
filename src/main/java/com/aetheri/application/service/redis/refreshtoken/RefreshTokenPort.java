@@ -23,7 +23,7 @@ import reactor.core.scheduler.Schedulers;
  */
 @Service
 @RequiredArgsConstructor
-public class RefreshTokenService {
+public class RefreshTokenPort {
     private final RedisRefreshTokenRepositoryPort redisRefreshTokenRepositoryPort;
     private final JwtTokenProviderPort jwtTokenProviderPort;
     private final JwtTokenResolverPort jwtTokenResolverPort;

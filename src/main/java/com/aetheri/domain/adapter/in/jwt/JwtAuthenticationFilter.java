@@ -2,7 +2,7 @@ package com.aetheri.domain.adapter.in.jwt;
 
 import com.aetheri.application.port.out.jwt.JwtTokenResolverPort;
 import com.aetheri.application.port.out.jwt.JwtTokenValidatorPort;
-import com.aetheri.application.service.redis.refreshtoken.RefreshTokenService;
+import com.aetheri.application.service.redis.refreshtoken.RefreshTokenPort;
 import com.aetheri.infrastructure.config.properties.JWTProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter implements WebFilter {
 
     private final JwtTokenValidatorPort jwtTokenValidatorPort;
     private final JwtTokenResolverPort jwtTokenResolverPort;
-    private final RefreshTokenService refreshTokenService; // 추가
+    private final RefreshTokenPort refreshTokenPort; // 추가
     private final JWTProperties jwtProperties;
 
     @Override
@@ -48,7 +48,7 @@ public class JwtAuthenticationFilter implements WebFilter {
                 // 만료된 액세스 토큰 → 리프레시 토큰 확인
                 String refreshToken = getRefreshTokenFromCookie(exchange);
                 if (refreshToken != null && !refreshToken.isBlank()) {
-                    return refreshTokenService.reissueTokens(refreshToken)
+                    return refreshTokenPort.reissueTokens(refreshToken)
                             .flatMap(tokenResponse -> {
                                 // 새 액세스 토큰은 헤더
                                 exchange.getResponse().getHeaders().set(jwtProperties.accessTokenHeader(), "Bearer " + tokenResponse.accessToken());

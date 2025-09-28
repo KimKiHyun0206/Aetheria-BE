@@ -21,16 +21,13 @@ import java.util.UUID;
 public class ImageMetadataRepositoryR2dbcAdapter implements ImageRepositoryPort {
     private final ImageMetadataR2dbcRepository imageMetadataR2DbcRepository;
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
-    private final String IMAGE_PATH;
 
     public ImageMetadataRepositoryR2dbcAdapter(
             ImageMetadataR2dbcRepository imageMetadataR2DbcRepository,
-            R2dbcEntityTemplate r2dbcEntityTemplate,
-            ImageProperties imageProperties
+            R2dbcEntityTemplate r2dbcEntityTemplate
     ) {
         this.imageMetadataR2DbcRepository = imageMetadataR2DbcRepository;
         this.r2dbcEntityTemplate = r2dbcEntityTemplate;
-        this.IMAGE_PATH = imageProperties.path();
     }
 
     /**
@@ -42,7 +39,7 @@ public class ImageMetadataRepositoryR2dbcAdapter implements ImageRepositoryPort 
     public Mono<Long> saveImageMetadata(ImageMetadataSaveDto dto) {
         ImageMetadata entity = ImageMetadata.toEntity(
                 dto.runnerId(),
-                IMAGE_PATH + dto.runnerId() + "-" + UUID.randomUUID(),
+                dto.runnerId() + "-" + UUID.randomUUID(),
                 dto.location(),
                 dto.shape(),
                 dto.proficiency()

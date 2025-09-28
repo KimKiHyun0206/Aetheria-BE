@@ -1,6 +1,6 @@
-package com.aetheri.application.service.image;
+package com.aetheri.application.service.imagemetadata;
 
-import com.aetheri.application.port.in.image.DeleteImageMetadataUseCase;
+import com.aetheri.application.port.in.imagemetadata.DeleteImageMetadataUseCase;
 import com.aetheri.application.port.out.image.ImageRepositoryPort;
 import com.aetheri.domain.exception.BusinessException;
 import com.aetheri.domain.exception.message.ErrorMessage;
@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DeleteImageMetadataService implements DeleteImageMetadataUseCase {
+public class DeleteImageMetadataPort implements DeleteImageMetadataUseCase {
     private final ImageRepositoryPort imageRepositoryPort;
 
     /**
