@@ -1,6 +1,6 @@
 package com.aetheri.interfaces.web.router;
 
-import com.aetheri.interfaces.web.handler.ImgFetchHandler;
+import com.aetheri.interfaces.web.handler.ImageFetchHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -17,13 +17,13 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 @Configuration
-public class ImgFetchRouter {
+public class ImageFetchRouter {
 
     @Bean
     @RouterOperation(
             path = "/api/v1/running-art/{path}",
             method = RequestMethod.GET,
-            beanClass = ImgFetchHandler.class,
+            beanClass = ImageFetchHandler.class,
             beanMethod = "imageFetch",
             operation = @Operation(
                     operationId = "fetchRunnerArtImage",
@@ -32,9 +32,9 @@ public class ImgFetchRouter {
                             @Parameter(
                                     in = ParameterIn.PATH,
                                     name = "path",
-                                    description = "이미지를 검색할 경로 또는 고유 식별자",
+                                    description = "이미지 파일명 (확장자 포함)",
                                     required = true,
-                                    example = "user12345"
+                                    example = "sample_image.png"
                             )
                     },
                     responses = {
@@ -54,9 +54,9 @@ public class ImgFetchRouter {
                     }
             )
     )
-    public RouterFunction<ServerResponse> imageFetchRoutes(ImgFetchHandler imgFetchHandler) {
+    public RouterFunction<ServerResponse> imageFetchRoutes(ImageFetchHandler imageFetchHandler) {
         return RouterFunctions.route()
-                .GET("/api/v1/running-art/{path}", imgFetchHandler::imageFetch)
+                .GET("/api/v1/running-art/{path}", imageFetchHandler::imageFetch)
                 .build();
     }
 }
