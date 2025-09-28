@@ -12,9 +12,8 @@ public class ImagePathValidatePort implements ImagePathValidateUseCase {
     public Mono<Boolean> isValidatePath(String path) {
         if(isNull(path)) return Mono.just(false);
         if(isContainIllegalChar(path)) return Mono.just(false);
-        if(isValidFilename(path)) return Mono.just(false);
 
-        return Mono.just(true);
+        return Mono.just(isValidFilename(path));
     }
 
     /**
