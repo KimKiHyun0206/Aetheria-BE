@@ -40,6 +40,14 @@ public class ImagePathValidatePort implements ImagePathValidateUseCase {
      * @param filename 검사할 파일이름
      * */
     private boolean isValidFilename(String filename) {
-        return filename.matches("^[A-Za-z0-9._-]+$");
+        // 기본 문자 검증
+        if (!filename.matches("^[A-Za-z0-9._-]+$")) {
+            return false;
+        }
+        // 허용된 이미지 확장자 검증
+        String lowerCaseFilename = filename.toLowerCase();
+        return lowerCaseFilename.endsWith(".png") ||
+                lowerCaseFilename.endsWith(".jpg") ||
+                lowerCaseFilename.endsWith(".jpeg");
     }
 }
