@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .pathMatchers("/api/hello/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/v1/image").authenticated()  // SSE 이미지 스트리밍을 사용한 전체 조회
                         .pathMatchers(HttpMethod.GET, "/api/v1/image/**").permitAll()   // 이미지 단건 조회
+                        .pathMatchers(HttpMethod.GET, "/api/v1/running-art/**").permitAll()
                         .pathMatchers("/api/v1/auth/authorization/kakao", "/api/v1/auth/sign-in", "/login/oauth2/code/kakao").permitAll()
                         // 위에 명시된 경로를 제외한 모든 요청은 인증된 사용자만 접근할 수 있다.
                         .anyExchange().authenticated()
