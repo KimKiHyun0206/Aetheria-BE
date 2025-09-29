@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 /**
- * 회원가입 서비스
- * */
+ * 신규 사용자 회원가입 유즈케이스({@link SignUpUseCase})를 구현하는 서비스 클래스입니다.
+ * 이 클래스는 카카오 인증을 통해 얻은 정보를 사용하여 시스템 데이터베이스에 새로운 사용자를 등록하는
+ * 비즈니스 로직을 수행합니다.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -20,16 +22,24 @@ public class SignUpPort implements SignUpUseCase {
     private final RunnerRepositoryPort runnerRepositoryPort;
 
     /**
-     * 서버 측의 회원가입을 위한 메소드.
+     * 카카오 ID와 이름을 사용하여 시스템에 신규 사용자를 등록(회원가입)합니다.
      *
-     * @param id   사용자의 ID
-     * @param name 사용자의 이름
-     * @implNote Void로 반환하는 이유는 회원가입하고 난 엔티티를 비즈니스 로직에서 다시 사용하지 않을 것이기 때문.
-     * @implNote then을 사용하는 이유는 {@code Mono<Runner>}를 {@code Mono<Void>}로 변환하기 위함임.
+     * <p>회원가입 절차는 다음과 같습니다:</p>
+     * <ol>
+     * <li>카카오 ID로 사용자가 이미 존재하는지 확인합니다.</li>
+     * <li>사용자가 **이미 존재**하면, {@code DUPLICATE_RUNNER} 예외를 발생시킵니다.</li>
+     * <li>사용자가 **존재하지 않으면**, 새로운 {@code Runner} 엔티티를 생성하고 데이터베이스에 저장합니다.</li>
+     * </ol>
+     *
+     * @param id 카카오 API를 통해 얻은 사용자의 고유 식별자(카카오 ID)입니다.
+     * @param name 사용자의 초기 이름(닉네임)입니다.
+     * @return 회원가입 처리가 완료되었을 때 종료되는 {@code Mono<Void>} 객체입니다.
+     * @throws BusinessException 이미 동일한 카카오 ID로 가입된 사용자가 존재할 경우 {@code DUPLICATE_RUNNER} 예외를 발생시킵니다.
+     * @implNote 최종적으로 {@code Mono<Void>}를 반환하는 이유는, 비즈니스 로직 후속 단계에서 저장된 엔티티 객체 자체를 필요로 하지 않기 때문입니다.
      */
     @Override
     public Mono<Void> signUp(Long id, String name) {
-                // 카카오 ID로 사용자가 존재하는지 확인
+        // 카카오 ID로 사용자가 존재하는지 확인
         return existsByKakaoId(id)
                 // 만약 이미 존재한다면, (true -> false)가 되어 스트림이 비어버림
                 .filter(isExist -> !isExist)
@@ -40,21 +50,26 @@ public class SignUpPort implements SignUpUseCase {
                 )))
                 // 스트림이 비어있지 않을 때 (사용자가 존재하지 않을 때), 회원가입 진행
                 .flatMap(notExists -> saveRunner(id, name))
-                .then(); // Mono<Void>로 변환
+                .then(); // Mono<Runner>를 Mono<Void>로 변환하여 반환
     }
 
     /**
-     * 카카오 ID로 회원가입이 되어있는지 조회합니다.
+     * 주어진 카카오 ID를 사용하여 데이터베이스에 해당 사용자가 존재하는지 확인합니다.
      *
-     * @param id 조회할 카카오 ID
-     * */
+     * @param id 조회할 사용자의 카카오 ID입니다.
+     * @return 사용자가 존재하면 {@code true}를, 존재하지 않으면 {@code false}를 발행하는 {@code Mono<Boolean>}입니다.
+     */
     private Mono<Boolean> existsByKakaoId(Long id) {
         return runnerRepositoryPort.existsByKakaoId(id);
     }
 
     /**
-     * 데이터베이스에 사용자를 저장하기 위한 메소드
-     * */
+     * 새로운 사용자 엔티티를 생성하고 데이터베이스에 저장합니다.
+     *
+     * @param id 사용자의 카카오 ID입니다.
+     * @param name 사용자의 이름입니다.
+     * @return 저장된 {@code Runner} 엔티티를 발행하는 {@code Mono}입니다.
+     */
     private Mono<Runner> saveRunner(Long id, String name) {
         Runner runner = new Runner(
                 id,
