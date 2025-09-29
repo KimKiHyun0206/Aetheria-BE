@@ -189,7 +189,7 @@ public class SignInPort implements SignInUseCase {
     private Mono<Long> saveKakaoToken(KakaoTokenAndId dto) {
         return kakaoTokenRepositoryPort.save(
                         dto.id(),
-                        dto.accessToken,
+                        dto.accessToken(),
                         dto.refreshToken()
                 )
                 .thenReturn(dto.id());
