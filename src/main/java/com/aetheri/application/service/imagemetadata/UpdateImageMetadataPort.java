@@ -9,11 +9,12 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 /**
- * 이미지 메타데이터를 수정하기 위한 서비스
+ * 이미지 메타데이터 수정 유즈케이스({@link UpdateImageMetadataUseCase})를 구현하는 서비스 클래스입니다.
+ * 이 클래스는 특정 사용자의 요청에 따라 기존 이미지 메타데이터를 업데이트하는 비즈니스 로직을 수행합니다.
  *
- * @see UpdateImageMetadataUseCase 구현하는 유즈케이스
- * @see ImageRepositoryPort 데이터베이스에 접근하기 위해 접근하는 포트
- * */
+ * @see UpdateImageMetadataUseCase 구현하는 유즈케이스 인터페이스
+ * @see ImageRepositoryPort 데이터베이스 접근을 위한 아웃고잉 포트
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -21,16 +22,16 @@ public class UpdateImageMetadataPort implements UpdateImageMetadataUseCase {
     private final ImageRepositoryPort imageRepositoryPort;
 
     /**
-     * Update metadata for an image.
+     * 주어진 사용자를 대신하여 기존 이미지의 메타데이터를 수정합니다.
      *
-     * <p>Only the owner of the image (the requesting user) is allowed to perform this update;
-     * this method delegates authorization/enforcement to the underlying repository/port.
+     * <p>이미지의 소유자(요청 사용자)만이 이 업데이트를 수행할 수 있으며,
+     * 해당 권한 확인/강제 적용 로직은 하위 저장소 포트(repository/port)로 위임됩니다.</p>
      *
-     * @param runnerId the ID of the user requesting the update
-     * @param imageId  the ID of the image whose metadata will be updated
-     * @param request  the metadata update payload
-     * @return a Mono that completes when the update finishes; it emits no value
-     *         (errors from the repository call propagate through the returned Mono)
+     * @param runnerId 업데이트를 요청하는 사용자의 고유 식별자(ID)입니다. (소유권 확인에 사용됨)
+     * @param imageId 메타데이터를 수정할 이미지의 고유 식별자(ID)입니다.
+     * @param request 업데이트할 메타데이터 필드(예: 제목, 설명)가 포함된 요청 DTO입니다.
+     * @return 업데이트 작업이 완료되었을 때 종료되는 {@code Mono<Void>} 객체입니다.
+     * (저장소 호출에서 발생하는 오류는 반환된 {@code Mono}를 통해 전파됩니다.)
      */
     @Override
     public Mono<Void> updateImageMetadata(Long runnerId, Long imageId, ImageMetadataUpdateRequest request) {

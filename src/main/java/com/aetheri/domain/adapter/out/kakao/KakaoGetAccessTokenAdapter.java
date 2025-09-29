@@ -12,13 +12,22 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 /**
- * 카카오 로그인 API를 사용하여 액세스 토큰을 가져오기 위한 서비스
+ * 카카오 로그인 인증 코드({@code code})를 사용하여 **액세스 토큰(Access Token) 및 리프레시 토큰(Refresh Token)을
+ * 발급받기 위한 외부 통신 포트({@link KakaoGetAccessTokenPort})의 구현체**입니다.
+ *
+ * <p>이 서비스는 카카오 인증 서버의 `/oauth/token` 엔드포인트에 요청을 보냅니다.</p>
  */
 @Service
 public class KakaoGetAccessTokenAdapter implements KakaoGetAccessTokenPort {
     private final String clientId;
     private final WebClient webClient;
 
+    /**
+     * {@code KakaoGetAccessTokenAdapter}의 생성자입니다.
+     *
+     * @param webClient 카카오 인증 서버와 통신하도록 설정된 {@code WebClient} 인스턴스입니다.
+     * @param kakaoProperties 카카오 애플리케이션의 설정 값들을 담고 있는 프로퍼티 객체입니다.
+     */
     public KakaoGetAccessTokenAdapter(
             @Qualifier("kakaoAuthWebClient") WebClient webClient,
             KakaoProperties kakaoProperties
@@ -28,22 +37,32 @@ public class KakaoGetAccessTokenAdapter implements KakaoGetAccessTokenPort {
     }
 
     /**
-     * 카카오 Access 토큰 발급을 위한 요청 코드
-     * <a href="https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token">카카오 REST API</a>
+     * 카카오 인증 코드({@code code})를 사용하여 액세스 토큰 발급을 요청합니다.
      *
-     * @param code 카카오에서 발급해준 인증 코드
+     * <p>요청은 다음과 같은 파라미터를 포함하는 POST 요청으로 이루어집니다:</p>
+     * <ul>
+     * <li>{@code grant_type}: authorization_code (고정)</li>
+     * <li>{@code client_id}: 애플리케이션의 REST API 키</li>
+     * <li>{@code code}: 카카오 로그인 후 받은 인증 코드</li>
+     * </ul>
+     *
+     * @param code 카카오에서 발급해준 인증 코드입니다.
+     * @return 카카오 토큰 응답({@code KakaoTokenResponse})을 발행하는 {@code Mono} 객체입니다.
+     * @see <a href="https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token">카카오 REST API - 토큰 요청</a>
      */
     @Override
     public Mono<KakaoTokenResponse> tokenRequest(String code) {
         return webClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
-                        .path("/oauth/token")
+                        .path("/oauth/token") // 토큰 요청 엔드포인트
                         .queryParam("grant_type", "authorization_code")
                         .queryParam("client_id", clientId)
                         .queryParam("code", code)
+                        // build(true)를 사용하여 쿼리 파라미터 자동 인코딩을 명시적으로 활성화 (필요 시)
                         .build(true))
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
+                // WebClient 응답을 처리하고 오류를 적절히 변환합니다.
                 .exchangeToMono(WebClientErrorHandler.handleErrors(KakaoTokenResponse.class));
     }
 }

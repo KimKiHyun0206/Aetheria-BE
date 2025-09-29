@@ -16,6 +16,12 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 
 
+/**
+ * Spring WebFlux 기반의 **반응형(Reactive) 보안 설정 클래스**입니다.
+ *
+ * <p>이 클래스는 JWT(JSON Web Token)를 사용하여 세션리스(Stateless) 인증 방식을 구현하며,
+ * 특정 경로에 대한 접근 권한 설정과 커스텀 JWT 필터({@link JwtAuthenticationFilter}) 등록을 담당합니다.</p>
+ */
 @Configuration
 @EnableWebFluxSecurity
 @RequiredArgsConstructor
@@ -25,26 +31,31 @@ public class SecurityConfig {
     private final JWTProperties jwtProperties;
     private final RefreshTokenPort refreshTokenPort;
 
+    /**
+     * 애플리케이션의 보안 필터 체인을 구성하는 {@link SecurityWebFilterChain} 빈을 정의합니다.
+     *
+     * @param http Spring Security 설정을 위한 {@code ServerHttpSecurity} 빌더입니다.
+     * @return 설정이 완료된 {@code SecurityWebFilterChain} 인스턴스입니다.
+     */
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
-                // JWT를 사용하기 때문에 CSRF를 비활성화한다.
+                // JWT 기반 인증을 사용하므로 CSRF 보호 기능을 비활성화합니다.
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                // HTTP Basic 인증을 비활성화합니다.
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
 
                 /*
                 Spring Security의 요청 캐싱 기능을 비활성화합니다.
-                이는 인증되지 않은 사용자가 보호된 리소스에 접근했을 때,
-                로그인 성공 후 원래 요청했던 페이지로 자동으로 리다이렉션하는 기능을 끕니다.
-                API 서버와 같이 리다이렉션이 필요 없는 경우에 사용됩니다.
+                API 서버는 리다이렉션이 필요 없으므로 이 기능을 비활성화하여 오버헤드를 줄입니다.
                 */
                 .requestCache(ServerHttpSecurity.RequestCacheSpec::disable)
 
                 // 인증에 따른 접근 가능 여부 설정
                 .authorizeExchange(exchanges -> exchanges
-                        // Spring Actuator 접근 URL 허용
+                        // Spring Actuator 관련 URL은 인증 없이 접근을 허용합니다. (헬스 체크 등)
                         .pathMatchers("/actuator/**").permitAll()
-                        // Swagger 접근에 필요한 URL
+                        // Swagger UI 및 API 문서 관련 URL은 인증 없이 접근을 허용합니다.
                         .pathMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
@@ -52,22 +63,27 @@ public class SecurityConfig {
                                 "/webjars/swagger-ui/**",
                                 "/api-docs/**"
                         ).permitAll()
+                        // 테스트용 경로 (예: 헬로 월드) 접근 허용
                         .pathMatchers("/api/hello/**").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/v1/image").authenticated()  // SSE 이미지 스트리밍을 사용한 전체 조회
-                        .pathMatchers(HttpMethod.GET, "/api/v1/image/**").permitAll()   // 이미지 단건 조회
+                        // 이미지 스트리밍 전체 조회 (GET /api/v1/image)는 인증된 사용자만 접근 가능
+                        .pathMatchers(HttpMethod.GET, "/api/v1/image").authenticated()
+                        // 이미지 단건 조회 (GET /api/v1/image/{id})는 인증 없이 접근 허용
+                        .pathMatchers(HttpMethod.GET, "/api/v1/image/**").permitAll()
+                        // 런닝 아트 관련 조회 API는 인증 없이 접근 허용
                         .pathMatchers(HttpMethod.GET, "/api/v1/running-art/**").permitAll()
+                        // 카카오 인증 및 로그인 관련 엔드포인트는 인증 없이 접근 허용
                         .pathMatchers("/api/v1/auth/authorization/kakao", "/api/v1/auth/sign-in", "/login/oauth2/code/kakao").permitAll()
-                        // 위에 명시된 경로를 제외한 모든 요청은 인증된 사용자만 접근할 수 있다.
+                        // 위에 명시된 경로를 제외한 모든 요청은 인증된 사용자만 접근할 수 있도록 설정합니다.
                         .anyExchange().authenticated()
                 )
-                // formLogin 기능도 명시적으로 비활성화
+                // 폼 기반 로그인 기능을 명시적으로 비활성화합니다.
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
 
-                // JWT를 사용한 세션리스(stateless) 인증이므로, 세션 저장소를 사용하지 않도록 설정한다.
+                // JWT를 사용하는 세션리스 인증이므로, 보안 컨텍스트를 저장하지 않도록 설정합니다.
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
 
-                // SecurityWebFiltersOrder.AUTHENTICATION 위치에 JwtAuthenticationFilter를 추가한다.
-                // 이 필터는 HTTP 요청 헤더에서 JWT 토큰을 추출하고, 토큰의 유효성을 검사하여 인증 객체(Authentication)를 생성한다.
+                // 인증 필터 체인에 커스텀 JWT 인증 필터({@code JwtAuthenticationFilter})를 추가합니다.
+                // 이 필터는 HTTP 요청에서 JWT를 추출하고 유효성을 검사하여 인증 객체를 설정하는 역할을 합니다.
                 .addFilterAt(
                         new JwtAuthenticationFilter(
                                 jwtTokenValidatorPort,

@@ -13,6 +13,10 @@ import reactor.core.publisher.Mono;
 
 import java.nio.file.Paths;
 
+/**
+ * 서버에 저장된 이미지를 조회하는 유즈케이스({@link ImageFetchUseCase})를 구현하는 서비스 클래스입니다.
+ * 이 클래스는 요청된 경로의 유효성을 검증한 후, {@link ResourceLoader}를 사용하여 이미지 파일을 {@link Resource} 형태로 로드합니다.
+ */
 @Slf4j
 @Service
 public class ImageFetchPort implements ImageFetchUseCase {
@@ -20,6 +24,13 @@ public class ImageFetchPort implements ImageFetchUseCase {
     private final ImagePathValidateUseCase imagePathValidator;
     private final String locationPattern;
 
+    /**
+     * {@code ImageFetchPort}의 생성자입니다.
+     *
+     * @param resourceLoader 이미지 리소스를 로드하는 데 사용되는 Spring의 리소스 로더입니다.
+     * @param imagePathValidator 이미지 경로의 유효성을 검증하는 유즈케이스입니다.
+     * @param imageProperties 이미지 파일 저장 경로 설정값을 담고 있는 프로퍼티 객체입니다.
+     */
     public ImageFetchPort(
             ResourceLoader resourceLoader,
             ImagePathValidateUseCase imagePathValidator,
@@ -27,16 +38,30 @@ public class ImageFetchPort implements ImageFetchUseCase {
     ) {
         this.resourceLoader = resourceLoader;
         this.imagePathValidator = imagePathValidator;
+        // 이미지 프로퍼티에서 실제 파일 저장 경로 패턴을 가져옵니다.
         this.locationPattern = imageProperties.path();
     }
 
+    /**
+     * 주어진 경로({@code path})에서 이미지 파일을 조회합니다.
+     *
+     * <p>요청된 경로에서 파일 이름을 추출한 후, 경로 유효성 검증을 먼저 수행합니다.
+     * 유효성 검증에 실패하거나 이미지를 찾지 못하면 {@link BusinessException}을 발생시키고,
+     * 성공하면 {@link Resource} 객체를 반환합니다.</p>
+     *
+     * @param path 이미지를 조회할 파일 시스템 또는 저장소 내의 경로입니다.
+     * @return 조회된 이미지 파일 데이터를 담고 있는 {@code Resource} 객체를 발행하는 {@code Mono}입니다.
+     * @throws BusinessException 경로가 유효하지 않을 때(INVALID\_IMAGE\_PATH) 또는 이미지를 찾지 못했을 때(NOT\_FOUND\_IMAGE) 발생합니다.
+     */
     @Override
     public Mono<Resource> fetchImage(String path) {
+        // 경로에서 순수 파일 이름만 추출합니다.
         String fileName = Paths.get(path).getFileName().toString();
 
         return imagePathValidator.isValidatePath(fileName)
                 .flatMap(valid -> {
                     if (!valid) {
+                        // 1. 경로 유효성 검사 실패 시
                         return Mono.error(
                                 new BusinessException(
                                         ErrorMessage.INVALID_IMAGE_PATH,
@@ -44,9 +69,11 @@ public class ImageFetchPort implements ImageFetchUseCase {
                                 )
                         );
                     }
+                    // 2. 유효성 검사 통과 시, 실제 저장 경로와 파일 이름을 합쳐 Resource 로드 시도
                     return Mono.just(resourceLoader.getResource(locationPattern + fileName));
                 })
                 .switchIfEmpty(
+                        // 3. Mono.just()가 Resource를 발행하지 못하고 Mono가 비어있을 경우 (실제 ResourceLoader가 파일을 찾지 못했을 때)
                         Mono.error(
                                 new BusinessException(
                                         ErrorMessage.NOT_FOUND_IMAGE,

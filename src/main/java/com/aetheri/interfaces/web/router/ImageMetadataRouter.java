@@ -23,14 +23,19 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import static org.springframework.web.reactive.function.server.ServerResponse.ok;
-
+/**
+ * 이미지 메타데이터(제목, 설명 등)에 대한 CRUD API 엔드포인트를 정의하는 **WebFlux 라우터 설정 클래스**입니다.
+ *
+ * <p>함수형 엔드포인트 방식을 사용하여 {@code /api/v1/image} 경로에 대한 라우팅 규칙을 설정하고,
+ * 각 요청을 {@code ImageMetadataHandler}의 메서드에 매핑합니다.
+ * 특히, 전체 조회는 **Server-Sent Events (SSE)**를 사용하도록 구성되어 있습니다.</p>
+ */
 @Slf4j
 @Configuration
 public class ImageMetadataRouter {
     @Bean
     @RouterOperations({
-            // GET 요청에 대한 API 문서 정의
+            // 1. 단건 조회 (GET /api/v1/image/{imageId})
             @RouterOperation(
                     path = "/api/v1/image/{imageId}",
                     method = RequestMethod.GET,
@@ -39,6 +44,8 @@ public class ImageMetadataRouter {
                     operation = @Operation(
                             operationId = "findImageById",
                             summary = "ID로 이미지 메타데이터를 조회합니다.",
+                            description = "인증된 사용자는 자신의 이미지를 조회할 수 있으며, 공유된(Shared) 이미지도 조회할 수 있습니다.",
+                            tags = {"Image Metadata"},
                             parameters = {
                                     @Parameter(
                                             name = "imageId",
@@ -51,7 +58,7 @@ public class ImageMetadataRouter {
                                     @ApiResponse(
                                             responseCode = "200",
                                             description = "정상적으로 이미지 메타데이터를 반환합니다.",
-                                            content = @Content(schema = @Schema(implementation = String.class))
+                                            content = @Content(schema = @Schema(implementation = ImageMetadataResponse.class))
                                     ),
                                     @ApiResponse(
                                             responseCode = "404",
@@ -60,6 +67,7 @@ public class ImageMetadataRouter {
                             }
                     )
             ),
+            // 2. 전체 조회 (GET /api/v1/image) - SSE 사용
             @RouterOperation(
                     path = "/api/v1/image",
                     method = RequestMethod.GET,
@@ -67,21 +75,23 @@ public class ImageMetadataRouter {
                     beanMethod = "findImagesByRunnerId",
                     operation = @Operation(
                             operationId = "findImagesByRunnerId",
-                            summary = "사용자 ID로 이미지 메타데이터를 조회합니다.",
+                            summary = "인증된 사용자의 모든 이미지 메타데이터를 SSE로 스트리밍 조회합니다.",
+                            description = "인증된 사용자만 접근 가능하며, 데이터는 Server-Sent Events(text/event-stream) 형식으로 스트리밍됩니다.",
+                            tags = {"Image Metadata"},
                             responses = {
                                     @ApiResponse(
                                             responseCode = "200",
-                                            description = "정상적으로 이미지 메타데이터를 반환합니다.",
-                                            content = @Content(schema = @Schema(implementation = String.class))
+                                            description = "이미지 메타데이터 목록이 SSE 형태로 스트리밍됩니다.",
+                                            content = @Content(mediaType = MediaType.TEXT_EVENT_STREAM_VALUE, schema = @Schema(implementation = ImageMetadataResponse.class))
                                     ),
                                     @ApiResponse(
-                                            responseCode = "404",
-                                            description = "해당 ID의 이미지를 찾을 수 없습니다."
+                                            responseCode = "401",
+                                            description = "인증 정보가 유효하지 않습니다."
                                     )
                             }
                     )
             ),
-            // DELETE 요청에 대한 API 문서 정의
+            // 3. 삭제 (DELETE /api/v1/image/{imageId})
             @RouterOperation(
                     path = "/api/v1/image/{imageId}",
                     method = RequestMethod.DELETE,
@@ -89,9 +99,9 @@ public class ImageMetadataRouter {
                     beanMethod = "deleteImage",
                     operation = @Operation(
                             operationId = "deleteImageById",
-                            summary = "ID로 이미지를 삭제합니다.",
+                            summary = "ID로 이미지 메타데이터를 삭제합니다. (소유자만 가능)",
+                            tags = {"Image Metadata"},
                             parameters = {
-                                    // imageId를 pathVariable로 정의
                                     @Parameter(
                                             name = "imageId",
                                             in = ParameterIn.PATH,
@@ -107,7 +117,7 @@ public class ImageMetadataRouter {
                             }
                     )
             ),
-            // PUT 요청에 대한 API 문서 정의
+            // 4. 수정 (PUT /api/v1/image/{imageId})
             @RouterOperation(
                     path = "/api/v1/image/{imageId}",
                     method = RequestMethod.PUT,
@@ -115,7 +125,8 @@ public class ImageMetadataRouter {
                     beanMethod = "updateImage",
                     operation = @Operation(
                             operationId = "updateImageById",
-                            summary = "ID로 이미지 메타데이터를 업데이트합니다.",
+                            summary = "ID로 이미지 메타데이터를 업데이트합니다. (소유자만 가능)",
+                            tags = {"Image Metadata"},
                             parameters = {
                                     @Parameter(
                                             name = "imageId",
@@ -139,7 +150,7 @@ public class ImageMetadataRouter {
                             }
                     )
             ),
-            // POST 요청에 대한 API 문서 정의
+            // 5. 저장 (POST /api/v1/image)
             @RouterOperation(
                     path = "/api/v1/image",
                     method = RequestMethod.POST,
@@ -148,6 +159,7 @@ public class ImageMetadataRouter {
                     operation = @Operation(
                             operationId = "saveImage",
                             summary = "새로운 이미지 메타데이터를 저장합니다.",
+                            tags = {"Image Metadata"},
                             requestBody = @RequestBody(
                                     required = true,
                                     description = "저장할 이미지 메타데이터",
@@ -167,13 +179,18 @@ public class ImageMetadataRouter {
     public RouterFunction<ServerResponse> imageRoutes(ImageMetadataHandler handler) {
         return RouterFunctions.route()
                 .path("/api/v1/image", builder -> builder
+                        // POST /api/v1/image: 저장
                         .POST("", handler::saveImage)
+                        // GET /api/v1/image: 전체 조회 (SSE)
                         .GET("", request -> ServerResponse.ok()
-                                .contentType(MediaType.TEXT_EVENT_STREAM)
+                                .contentType(MediaType.TEXT_EVENT_STREAM) // SSE Content-Type 설정
                                 .body(handler.findImagesByRunnerId(request), ServerSentEvent.class)
                         )
+                        // GET /api/v1/image/{imageId}: 단건 조회
                         .GET("/{imageId}", handler::findImage)
+                        // DELETE /api/v1/image/{imageId}: 삭제
                         .DELETE("/{imageId}", handler::deleteImage)
+                        // PUT /api/v1/image/{imageId}: 수정
                         .PUT("/{imageId}", handler::updateImage)
                 )
                 .build();

@@ -9,11 +9,12 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 /**
- * 이미지 메타데이터를 생성하기 위한 서비스
+ * 이미지 메타데이터 생성 유즈케이스({@link SaveImageMetadataUseCase})를 구현하는 서비스 클래스입니다.
+ * 이 클래스는 특정 사용자를 대신하여 요청된 이미지 메타데이터를 데이터베이스에 영속화하는 비즈니스 로직을 수행합니다.
  *
- * @see SaveImageMetadataUseCase 구현하는 유즈케이스
- * @see ImageRepositoryPort 데이터베이스에 접근하기 위해 접근하는 포트
- * */
+ * @see SaveImageMetadataUseCase 구현하는 유즈케이스 인터페이스
+ * @see ImageRepositoryPort 데이터베이스 접근을 위한 아웃고잉 포트
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -21,15 +22,16 @@ public class SaveImageMetadataPort implements SaveImageMetadataUseCase {
     private final ImageRepositoryPort imageRepositoryPort;
 
     /**
-     * Persist image metadata for the given runner.
+     * 주어진 사용자({@code runnerId})를 대신하여 이미지 메타데이터를 영속화(저장)합니다.
      *
-     * Builds an ImageMetadataSaveDto from the provided runnerId and request and delegates persistence
-     * to the image repository port. The returned Mono completes when the save operation succeeds;
-     * any errors from the repository are propagated downstream.
+     * <p>제공된 사용자 ID와 요청({@code request})을 사용하여 이미지 메타데이터를 구성하고,
+     * 이를 이미지 저장소 포트({@code imageRepositoryPort})에 위임하여 데이터베이스에 저장합니다.
+     * 저장 작업이 성공적으로 완료되면 반환되는 {@code Mono}가 빈 값으로 완료됩니다.
+     * 저장소에서 발생한 모든 오류는 다운스트림으로 전파됩니다.</p>
      *
-     * @param runnerId the ID of the user creating the image metadata
-     * @param request  request containing metadata fields (location, shape, proficiency)
-     * @return a Mono that completes when the metadata has been persisted
+     * @param runnerId 이미지 메타데이터 생성을 요청하는 사용자의 고유 식별자(ID)입니다.
+     * @param request 메타데이터 필드(위치, 형태, 숙련도 등)를 포함하는 요청 DTO입니다.
+     * @return 메타데이터 영속화(저장) 작업이 완료되었을 때 종료되는 {@code Mono<Void>} 객체입니다.
      */
     @Override
     public Mono<Void> saveImageMetadata(Long runnerId, ImageMetadataSaveRequest request) {

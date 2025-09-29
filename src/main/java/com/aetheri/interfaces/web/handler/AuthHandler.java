@@ -18,6 +18,12 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
+/**
+ * 사용자 인증 및 권한 부여와 관련된 **HTTP 요청을 처리하는 핸들러 클래스**입니다.
+ *
+ * <p>카카오 소셜 로그인을 통한 인증, JWT 토큰 발급, 로그아웃, 회원 탈퇴 등의 비즈니스 로직을
+ * {@code UseCase} 포트를 통해 실행하고, 그 결과를 {@code ServerResponse}로 변환하여 응답합니다.</p>
+ */
 @Slf4j
 @Component
 public class AuthHandler {
@@ -30,6 +36,12 @@ public class AuthHandler {
     private final String refreshTokenCookie;
     private final String accessTokenHeader;
 
+    /**
+     * {@code AuthHandler}의 의존성 주입 생성자입니다.
+     *
+     * <p>인증 관련 유스케이스와 설정({@code KakaoProperties}, {@code JWTProperties})으로부터
+     * 필요한 속성들을 초기화합니다.</p>
+     */
     public AuthHandler(
             SignInUseCase signInUseCase,
             SignOffUseCase signOffUseCase,
@@ -47,7 +59,12 @@ public class AuthHandler {
     }
 
     /**
-     * 인가 코드 요청 API. * <a href="https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-code">카카오 REST API</a> * * @implNote 리다이렉트를 걸어주는 것이기 때문에 핸들러에서 처리하도록 함. 만약 리다이랙트 URI 생성을 분리한다면 분리하여도 됨.
+     * 클라이언트를 카카오 로그인 페이지로 리다이렉트하여 **인가 코드(Authorization Code) 요청**을 수행합니다.
+     *
+     * <a href="https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-code">카카오 REST API 문서 참조</a>
+     *
+     * @param request 현재 서버 요청 정보입니다.
+     * @return 카카오 인가 URL로 리다이렉트하는 {@code ServerResponse}입니다.
      */
     public Mono<ServerResponse> redirectToKakaoLogin(ServerRequest request) {
         String kakaoAuthUrl = UriComponentsBuilder
@@ -57,28 +74,36 @@ public class AuthHandler {
                 .queryParam("response_type", "code")
                 .toUriString();
 
+        // 307 Temporary Redirect 응답을 반환합니다.
         return ServerResponse.temporaryRedirect(URI.create(kakaoAuthUrl)).build();
     }
 
     /**
-     * 로그인 후 사용자 정보를 가져오게 하는 핸들러
+     * 카카오로부터 전달받은 **인가 코드(Code)를 사용하여 액세스 토큰을 발급받고 로그인(회원가입 포함)을 처리**하는 핸들러입니다.
+     *
+     * <p>로그인 성공 후, 액세스 토큰은 응답 헤더에, 리프레시 토큰은 HTTP Only 쿠키에 설정하여 응답합니다.</p>
+     *
+     * @param request URL 쿼리 파라미터로 인가 코드를 포함하는 서버 요청 정보입니다.
+     * @return 인증 정보를 포함하는 {@code ServerResponse}입니다.
      */
     public Mono<ServerResponse> getKakaoAccessToken(ServerRequest request) {
 
-        return findCodeFromUrl(request)
-                .flatMap(signInUseCase::signIn)
-                .flatMap(response -> {
+        return findCodeFromUrl(request) // 1. 요청에서 인가 코드 추출
+                .flatMap(signInUseCase::signIn) // 2. 로그인 처리 (토큰 발급 및 사용자 등록)
+                .flatMap(response -> { // 3. 응답 처리 및 토큰 설정
                     log.info("[AuthHandler] 로그인 성공: \naccessToken={} \n refreshToken={}", response.accessToken(), response.refreshToken());
 
+                    // 리프레시 토큰을 HTTP Only 쿠키로 설정
                     ResponseCookie cookie = ResponseCookie
                             .from(refreshTokenCookie, response.refreshToken())
-                            .httpOnly(true)
-                            .secure(true)
-                            .path("/")
-                            .sameSite("Strict")
-                            .maxAge(response.refreshTokenExpirationTime())
+                            .httpOnly(true)     // JavaScript 접근 방지
+                            .secure(true)       // HTTPS에서만 전송
+                            .path("/")          // 전체 경로에서 유효
+                            .sameSite("Strict") // CSRF 공격 방지
+                            .maxAge(response.refreshTokenExpirationTime()) // 쿠키 만료 시간 설정
                             .build();
 
+                    // 액세스 토큰은 응답 헤더에 설정
                     return ServerResponse.ok()
                             .header(accessTokenHeader, response.accessToken())
                             .cookie(cookie)
@@ -86,6 +111,14 @@ public class AuthHandler {
                 });
     }
 
+    /**
+     * **서비스 로그아웃** 요청을 처리합니다.
+     *
+     * <p>인증된 사용자 ID를 추출하여 {@code SignOffUseCase}를 실행하고 204 No Content 응답을 반환합니다.</p>
+     *
+     * @param request 현재 서버 요청 정보입니다.
+     * @return 처리 완료 시 204 No Content를 반환하는 {@code ServerResponse}입니다.
+     */
     public Mono<ServerResponse> signOff(ServerRequest request) {
         return AuthenticationUtils.extractRunnerIdFromRequest(request)
                 .flatMap(runnerId -> {
@@ -94,6 +127,14 @@ public class AuthHandler {
                 });
     }
 
+    /**
+     * **회원 탈퇴** 요청을 처리합니다.
+     *
+     * <p>인증된 사용자 ID를 추출하여 {@code SignOutUseCase}를 실행하고 204 No Content 응답을 반환합니다.</p>
+     *
+     * @param request 현재 서버 요청 정보입니다.
+     * @return 처리 완료 시 204 No Content를 반환하는 {@code ServerResponse}입니다.
+     */
     public Mono<ServerResponse> signOut(ServerRequest request) {
         return AuthenticationUtils.extractRunnerIdFromRequest(request)
                 .flatMap(runnerId -> {
@@ -103,6 +144,12 @@ public class AuthHandler {
     }
 
 
+    /**
+     * 요청 URL의 쿼리 파라미터에서 **인가 코드({@code code})**를 추출합니다.
+     *
+     * @param request 인가 코드를 포함할 수 있는 서버 요청입니다.
+     * @return 인가 코드를 발행하는 {@code Mono<String>}입니다. 코드가 없으면 {@code BusinessException}을 발생시킵니다.
+     */
     private Mono<String> findCodeFromUrl(ServerRequest request) {
         return Mono.just(request.queryParam("code")
                 .orElseThrow(() ->
