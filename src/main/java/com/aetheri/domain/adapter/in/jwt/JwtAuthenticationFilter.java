@@ -87,6 +87,7 @@ public class JwtAuthenticationFilter implements WebFilter {
                                         )
                                         .httpOnly(true)
                                         .secure(true) // HTTPS에서만 사용 (배포 환경 고려)
+                                        .path("/")
                                         .maxAge(Duration.ofDays(jwtProperties.refreshTokenExpirationDays()))
                                         .sameSite("Strict")
                                         .build();
