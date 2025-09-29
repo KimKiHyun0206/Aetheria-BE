@@ -38,6 +38,11 @@ branches:
     prefix: 'enhancement/'
     name: 'develop'
 
+  # 'refactor' 라벨이 있는 이슈에 대한 브랜치 설정
+  - label: 'refactor'
+    prefix: 'refactor/'
+    name: 'develop'
+
 # 브랜치가 성공적으로 생성된 후 이슈에 남길 댓글 메시지입니다.
 # `${branchName}`은 실제 브랜치 이름으로, `${issue.title}`은 이슈 제목으로 대체됩니다.
 commentMessage: '🌱 브랜치 `${branchName}`가 생성되었습니다. 이슈: ${issue.title}'
