@@ -1,6 +1,6 @@
 package com.aetheri.application.port.out.image;
 
-import com.aetheri.application.dto.image.ImageMetadataSaveDto;
+import com.aetheri.application.dto.image.ImageMetadataSaveRequest;
 import com.aetheri.application.dto.image.ImageMetadataUpdateRequest;
 import com.aetheri.infrastructure.persistence.entity.ImageMetadata;
 import reactor.core.publisher.Flux;
@@ -18,7 +18,7 @@ public interface ImageRepositoryPort {
  * @param dto DTO containing the fields required to create the image metadata
  * @return a Mono that emits the generated image metadata ID when persistence completes
  */
-    Mono<Long> saveImageMetadata(ImageMetadataSaveDto dto);
+    Mono<Long> saveImageMetadata(Long runnerId, ImageMetadataSaveRequest dto);
 
     /**
  * Retrieves image metadata by its image identifier.

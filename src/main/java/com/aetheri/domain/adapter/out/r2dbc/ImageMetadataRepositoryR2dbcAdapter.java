@@ -1,10 +1,9 @@
 package com.aetheri.domain.adapter.out.r2dbc;
 
-import com.aetheri.application.dto.image.ImageMetadataSaveDto;
+import com.aetheri.application.dto.image.ImageMetadataSaveRequest;
 import com.aetheri.application.dto.image.ImageMetadataUpdateRequest;
 import com.aetheri.application.port.out.image.ImageRepositoryPort;
 import com.aetheri.infrastructure.persistence.repository.ImageMetadataR2dbcRepository;
-import com.aetheri.infrastructure.config.properties.ImageProperties;
 import com.aetheri.infrastructure.persistence.entity.ImageMetadata;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
@@ -36,13 +35,13 @@ public class ImageMetadataRepositoryR2dbcAdapter implements ImageRepositoryPort 
      * @param dto 등록할 이미지의 메타데이터를 가진 DTO
      * @return 생성이 성공했는지 실패했는지
      */
-    public Mono<Long> saveImageMetadata(ImageMetadataSaveDto dto) {
+    public Mono<Long> saveImageMetadata(Long runnerId, ImageMetadataSaveRequest request) {
         ImageMetadata entity = ImageMetadata.toEntity(
-                dto.runnerId(),
-                dto.runnerId() + "-" + UUID.randomUUID(),
-                dto.location(),
-                dto.shape(),
-                dto.proficiency()
+                runnerId,
+                runnerId + "-" + UUID.randomUUID(),
+                request.location(),
+                request.shape(),
+                request.proficiency()
         );
         return imageMetadataR2DbcRepository.save(entity)
                 .flatMap(this::getImageMetadataId);
