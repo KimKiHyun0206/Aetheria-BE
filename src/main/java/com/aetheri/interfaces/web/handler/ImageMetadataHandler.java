@@ -147,6 +147,6 @@ public class ImageMetadataHandler {
                         request.bodyToMono(ImageMetadataUpdateRequest.class)
                                 .flatMap(dto -> updateImageMetadataUseCase.updateImageMetadata(runnerId, imageId, dto))
                 )
-                .then(ServerResponse.ok().bodyValue(null));
+                .then(ServerResponse.ok().build());
     }
 }
