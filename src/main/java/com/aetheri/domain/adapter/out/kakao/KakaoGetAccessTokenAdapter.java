@@ -59,8 +59,8 @@ public class KakaoGetAccessTokenAdapter implements KakaoGetAccessTokenPort {
                         .queryParam("grant_type", "authorization_code")
                         .queryParam("client_id", clientId)
                         .queryParam("code", code)
-                        // build(true)를 사용하여 쿼리 파라미터 자동 인코딩을 명시적으로 활성화 (필요 시)
-                        .build(true))
+                        // build()를 사용하여 쿼리 파라미터를 안전하게 인코딩합니다.
+                        .build())
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
                 // WebClient 응답을 처리하고 오류를 적절히 변환합니다.
                 .exchangeToMono(WebClientErrorHandler.handleErrors(KakaoTokenResponse.class));
