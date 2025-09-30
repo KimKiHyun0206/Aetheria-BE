@@ -61,6 +61,10 @@ public enum ErrorMessage {
      * 카카오 API 통신 중 리프레시 토큰을 찾을 수 없을 때 발생합니다. (404 Not Found)
      */
     NOT_FOUND_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "카카오 리프레쉬 토큰을 찾을 수 없습니다."),
+    /**
+     * 원인을 알 수 없이 카카오 API 통신 중 오류가 발생했을 때 발생한다 (500 Internal Server Error)
+     * */
+    INTERNAL_ERROR_IN_KAKAO_API(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 API 내부 오류가 발생했습니다."),
 
     // -----------------------------------------------------------------------------------------------------------------
     // JWT 에러
