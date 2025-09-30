@@ -9,7 +9,7 @@ package com.aetheri.application.dto;
  *
  * @param accessToken 발급된 액세스 토큰 문자열입니다. 리소스 접근에 사용되며, 응답 헤더에 담겨야 합니다.
  * @param refreshToken 발급된 리프레시 토큰 문자열입니다. 액세스 토큰 갱신에 사용되며, HTTP Only 쿠키에 담겨야 합니다.
- * @param refreshTokenExpirationTime 리프레시 토큰의 유효 기간(밀리초 또는 초)입니다.
+ * @param refreshTokenExpirationTime 리프레시 토큰의 유효 기간(밀리초)입니다.
  * 이 값은 쿠키의 만료 시간 설정에 사용됩니다.
  */
 public record SignInResponse(
