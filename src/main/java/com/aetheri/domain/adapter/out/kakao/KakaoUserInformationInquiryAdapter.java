@@ -52,7 +52,6 @@ public class KakaoUserInformationInquiryAdapter implements KakaoUserInformationI
         return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .scheme("https")
                         .path("/v2/user/me") // 사용자 정보 조회 엔드포인트
                         .build(true))
                 .headers(s -> s.setBearerAuth(accessToken)) // 액세스 토큰을 Bearer 스키마로 인가 헤더에 설정
