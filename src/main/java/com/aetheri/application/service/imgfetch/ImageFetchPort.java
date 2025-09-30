@@ -27,9 +27,9 @@ public class ImageFetchPort implements ImageFetchUseCase {
     /**
      * {@code ImageFetchPort}의 생성자입니다.
      *
-     * @param resourceLoader 이미지 리소스를 로드하는 데 사용되는 Spring의 리소스 로더입니다.
+     * @param resourceLoader     이미지 리소스를 로드하는 데 사용되는 Spring의 리소스 로더입니다.
      * @param imagePathValidator 이미지 경로의 유효성을 검증하는 유즈케이스입니다.
-     * @param imageProperties 이미지 파일 저장 경로 설정값을 담고 있는 프로퍼티 객체입니다.
+     * @param imageProperties    이미지 파일 저장 경로 설정값을 담고 있는 프로퍼티 객체입니다.
      */
     public ImageFetchPort(
             ResourceLoader resourceLoader,
@@ -59,21 +59,9 @@ public class ImageFetchPort implements ImageFetchUseCase {
         String fileName = Paths.get(path).getFileName().toString();
 
         return imagePathValidator.isValidatePath(fileName)
-                .flatMap(valid -> {
-                    if (!valid) {
-                        // 1. 경로 유효성 검사 실패 시
-                        return Mono.error(
-                                new BusinessException(
-                                        ErrorMessage.INVALID_IMAGE_PATH,
-                                        "유효한 이미지 요청이 아닙니다."
-                                )
-                        );
-                    }
-                    // 2. 유효성 검사 통과 시, 실제 저장 경로와 파일 이름을 합쳐 Resource 로드 시도
-                    return Mono.just(resourceLoader.getResource(locationPattern + fileName));
-                })
+                .flatMap(this::isValid)
+                .flatMap(v -> fetchImageFromStore(fileName))
                 .switchIfEmpty(
-                        // 3. Mono.just()가 Resource를 발행하지 못하고 Mono가 비어있을 경우 (실제 ResourceLoader가 파일을 찾지 못했을 때)
                         Mono.error(
                                 new BusinessException(
                                         ErrorMessage.NOT_FOUND_IMAGE,
@@ -81,5 +69,30 @@ public class ImageFetchPort implements ImageFetchUseCase {
                                 ))
                 )
                 .doOnSuccess(l -> log.info("이미지 조회에 성공했습니다."));
+    }
+
+    private Mono<Object> isValid(Boolean b) {
+        if (!b) {
+            return Mono.error(
+                    new BusinessException(
+                            ErrorMessage.INVALID_IMAGE_PATH,
+                            "유효한 이미지 요청이 아닙니다."
+                    )
+            );
+        }
+        return Mono.empty();
+    }
+
+    private Mono<Resource> fetchImageFromStore(String fileName) {
+        Resource resource = resourceLoader.getResource(locationPattern + fileName);
+        if (!resource.exists()) {
+            return Mono.error(
+                    new BusinessException(
+                            ErrorMessage.NOT_FOUND_IMAGE,
+                            "이미지를 조회하지 못했습니다."
+                    )
+            );
+        }
+        return Mono.just(resource);
     }
 }
