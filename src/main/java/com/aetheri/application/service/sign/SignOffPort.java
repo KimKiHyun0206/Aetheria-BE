@@ -53,6 +53,13 @@ public class SignOffPort implements SignOffUseCase {
                 .flatMap(this::refreshKakaoToken)
                 // 카카오에서 회원 탈퇴(연동 해제) 요청
                 .flatMap(this::unlinkKakaoUser)
+                .onErrorResume(ex -> {
+                    log.warn("[SignOffService] 카카오 API 연동 해제 실패. runnerId={}, cause={}", runnerId, ex.toString());
+                    return Mono.error(new BusinessException(
+                            ErrorMessage.INTERNAL_ERROR_IN_KAKAO_API,
+                            "회원 탈퇴 중 카카오 API 에서 오류가 발생했습니다"
+                    ));
+                })
                 // 데이터베이스에 저장된 카카오 토큰 삭제
                 .then(deleteKakaoToken(runnerId))
                 // Redis에서 시스템 리프레시 토큰 삭제
@@ -96,7 +103,8 @@ public class SignOffPort implements SignOffUseCase {
      * @return 연동 해제 작업이 완료되었을 때 종료되는 {@code Mono<Void>} 객체입니다.
      */
     private Mono<Void> unlinkKakaoUser(KakaoTokenResponse tokenResponse) {
-        return kakaoUnlinkPort.unlink(tokenResponse.accessToken()).then();
+        return kakaoUnlinkPort.unlink(tokenResponse.accessToken())
+                .then();
     }
 
     /**
