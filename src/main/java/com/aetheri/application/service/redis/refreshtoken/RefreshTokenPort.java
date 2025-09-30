@@ -112,12 +112,14 @@ public class RefreshTokenPort {
      * @return 새로운 토큰 쌍을 담은 {@code TokenResponse}를 발행하는 {@code Mono}입니다.
      */
     private Mono<TokenResponse> createAndSaveRefreshToken(Authentication authentication, Long runnerId) {
-        String accessToken = jwtTokenProviderPort.generateAccessToken(authentication);
-        RefreshTokenIssueResponse refreshToken = jwtTokenProviderPort.generateRefreshToken(authentication);
-        return redisRefreshTokenRepositoryPort
-                // 새로운 리프레시 토큰을 Redis에 저장합니다.
-                .saveRefreshToken(runnerId, refreshToken.refreshToken())
-                // 저장 성공 후, 최종 토큰 응답 DTO를 발행합니다.
-                .thenReturn(TokenResponse.of(accessToken, refreshToken));
+        Mono<String> accessTokenMono = Mono.fromCallable(() -> jwtTokenProviderPort.generateAccessToken(authentication))
+                .subscribeOn(Schedulers.boundedElastic());
+        Mono<RefreshTokenIssueResponse> refreshTokenMono = Mono.fromCallable(() -> jwtTokenProviderPort.generateRefreshToken(authentication))
+                .subscribeOn(Schedulers.boundedElastic());
+
+        return accessTokenMono.zipWith(refreshTokenMono)
+                .flatMap(tuple -> redisRefreshTokenRepositoryPort
+                        .saveRefreshToken(runnerId, tuple.getT2().refreshToken())
+                        .thenReturn(TokenResponse.of(tuple.getT1(), tuple.getT2())));
     }
 }
