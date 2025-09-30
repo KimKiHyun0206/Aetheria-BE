@@ -22,6 +22,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.List;
@@ -59,7 +60,7 @@ public class JwtAuthenticationFilter implements WebFilter {
      * 필터 체인의 핵심 로직을 정의합니다. 요청에서 액세스 토큰을 검증하고 인증 정보를 설정합니다.
      *
      * @param exchange 현재 서버 웹 교환 객체입니다.
-     * @param chain 다음 필터 또는 핸들러로의 체인입니다.
+     * @param chain    다음 필터 또는 핸들러로의 체인입니다.
      * @return 필터 체인 진행을 나타내는 {@code Mono<Void>}입니다.
      */
     @Override
@@ -93,19 +94,21 @@ public class JwtAuthenticationFilter implements WebFilter {
                                         .build();
                                 exchange.getResponse().addCookie(cookie);
 
-                                // 2-3. 새 액세스 토큰으로 SecurityContext 인증 세팅
-                                Long id = jwtTokenResolverPort.getIdFromToken(tokenResponse.accessToken());
-                                List<GrantedAuthority> authorities = jwtTokenResolverPort.getRolesFromToken(tokenResponse.accessToken())
-                                        .stream()
-                                        .filter(role -> role != null && !role.isBlank()) // null, 빈 문자열 제거
-                                        .map(SimpleGrantedAuthority::new)
-                                        .collect(Collectors.toList());
-
-                                Authentication authentication = generateAuthentication(id, authorities);
-
-                                // 2-4. 인증 정보를 Security Context에 담아 체인 계속 진행
-                                return chain.filter(exchange)
-                                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication));
+                                // 2-3. 새 액세스 토큰으로 SecurityContext 인증 세팅 (블로킹 호출 래핑)
+                                return Mono.fromCallable(() -> {
+                                            Long id = jwtTokenResolverPort.getIdFromToken(tokenResponse.accessToken());
+                                            List<GrantedAuthority> authorities = jwtTokenResolverPort.getRolesFromToken(tokenResponse.accessToken())
+                                                    .stream()
+                                                    .filter(role -> role != null && !role.isBlank())
+                                                    .map(SimpleGrantedAuthority::new)
+                                                    .collect(Collectors.toList());
+                                            return generateAuthentication(id, authorities);
+                                        })
+                                        .subscribeOn(Schedulers.boundedElastic())
+                                        .flatMap(authentication ->
+                                                chain.filter(exchange)
+                                                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
+                                        );
                             });
                 }
             }
@@ -135,8 +138,8 @@ public class JwtAuthenticationFilter implements WebFilter {
      * 토큰이 유효할 때 인증 정보를 설정하고 필터 체인을 계속 진행합니다.
      *
      * @param exchange 현재 서버 웹 교환 객체입니다.
-     * @param chain 다음 필터 체인입니다.
-     * @param token 유효한 액세스 토큰 문자열입니다.
+     * @param chain    다음 필터 체인입니다.
+     * @param token    유효한 액세스 토큰 문자열입니다.
      * @return 인증 정보를 {@code SecurityContext}에 설정한 후의 {@code Mono<Void>}입니다.
      */
     private Mono<Void> authenticateAndContinue(ServerWebExchange exchange, WebFilterChain chain, String token) {
@@ -171,7 +174,7 @@ public class JwtAuthenticationFilter implements WebFilter {
     /**
      * 주어진 사용자 ID와 권한 목록을 기반으로 {@link Authentication} 객체를 생성합니다.
      *
-     * @param id 토큰에서 추출된 사용자 ID입니다.
+     * @param id          토큰에서 추출된 사용자 ID입니다.
      * @param authorities 사용자의 권한 목록입니다.
      * @return 생성된 {@code Authentication} 객체입니다.
      */
