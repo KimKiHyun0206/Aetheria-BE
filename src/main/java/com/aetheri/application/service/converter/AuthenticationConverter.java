@@ -28,11 +28,7 @@ public class AuthenticationConverter {
      * @return 사용자의 ID와 권한 정보를 담은 {@code Authentication} 객체입니다.
      */
     public static Authentication toAuthentication(Runner runner) {
-        return new UsernamePasswordAuthenticationToken(
-                runner.getId(),       // principal
-                null,                 // credentials
-                List.of(new SimpleGrantedAuthority("ROLE_USER"))
-        );
+        return toAuthentication(runner.getId());
     }
 
     /**
