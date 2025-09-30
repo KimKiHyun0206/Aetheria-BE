@@ -11,6 +11,8 @@ reviews:
   auto_review:
     enabled: true
     drafts: false
+  base_branches:
+    - ".*"  # 모든 브랜치(master, main, feature/* 등)를 대상으로 하는 PR을 리뷰합니다.
 
   path_instructions:
     - path: "src/main/java/**/*.java"
@@ -42,3 +44,7 @@ knowledge_base:
     scope: auto
   issues:
     scope: auto
+
+code_generation:
+  docstrings:
+    language: "ko-KR"  # 코드에 자동으로 작성할 설명 주석의 언어
