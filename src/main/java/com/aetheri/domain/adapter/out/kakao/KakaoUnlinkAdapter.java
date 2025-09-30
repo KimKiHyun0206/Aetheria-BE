@@ -2,6 +2,9 @@ package com.aetheri.domain.adapter.out.kakao;
 
 import com.aetheri.application.dto.UnlinkResponse;
 import com.aetheri.application.port.out.kakao.KakaoUnlinkPort;
+import com.aetheri.application.util.ValidationUtils;
+import com.aetheri.domain.exception.BusinessException;
+import com.aetheri.domain.exception.message.ErrorMessage;
 import com.aetheri.infrastructure.handler.WebClientErrorHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -38,6 +41,12 @@ public class KakaoUnlinkAdapter implements KakaoUnlinkPort {
      */
     @Override
     public Mono<Long> unlink(String accessToken) {
+        ValidationUtils.validateNotEmpty(
+                accessToken,
+                ErrorMessage.INVALID_REQUEST_PARAMETER,
+                "액세스 토큰이 비어 있습니다."
+        );
+
         return webClient.post()
                 .uri("/v1/user/unlink") // 연동 해제 엔드포인트
                 // 액세스 토큰을 Bearer 스키마로 헤더에 설정
