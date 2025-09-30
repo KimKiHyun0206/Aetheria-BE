@@ -5,10 +5,6 @@ import lombok.Builder;
 
 import java.time.Instant;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import java.time.Instant;
-
 /**
  * 리프레시 토큰 발급 결과를 나타내는 응답 레코드입니다.
  * 이 레코드는 발급된 리프레시 토큰 자체와 토큰의 고유 식별자(JTI), 그리고 발급 시각을 포함합니다.
