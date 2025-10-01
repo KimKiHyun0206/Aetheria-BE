@@ -59,7 +59,7 @@ public class WebClientConfig {
                 .clientConnector(new ReactorClientHttpConnector(
                         HttpClient.create()
                                 // 연결 타임아웃 설정 (하드코딩된 5초)
-                                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, kakaoProperties.timeOutSeconds() * 1000)
                                 // 응답 전체 타임아웃 설정
                                 .responseTimeout(Duration.ofSeconds(kakaoProperties.timeOutSeconds()))
                                 // 연결이 수립된 후, Netty 핸들러를 추가하여 Read/Write 타임아웃 설정
