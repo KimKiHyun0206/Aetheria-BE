@@ -130,7 +130,7 @@ public class AuthHandler {
     /**
      * 회원 로그아웃 요청을 처리합니다.
      *
-     * <p>인증된 사용자 ID를 추출하여 {@code SignOutUseCase}를 실행하고 204 No Content 응답을 반환합니다.</p>
+     * <p>인증된 사용자 ID를 추출하여 {@code SignOutUseCase}를 실행하여 JWT 토큰을 무효화하고 Kakao 로그아웃을 수행한 후 204 No Content 응답을 반환합니다.</p>
      *
      * @param request 현재 서버 요청 정보입니다.
      * @return 처리 완료 시 204 No Content를 반환하는 {@code ServerResponse}입니다.
