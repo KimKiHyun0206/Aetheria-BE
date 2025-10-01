@@ -35,3 +35,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# 환경 변수 파일 (민감 정보)
+.env
+.env.local
+.env.*.local
+

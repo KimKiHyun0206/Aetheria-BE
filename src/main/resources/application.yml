@@ -1,0 +1,66 @@
+spring:
+  main:
+    web-application-type: reactive
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+  r2dbc:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    pool:
+      enabled: true # 커넥션 풀 활성화
+
+# Spring Actuator 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
+# /actuator/health: 애플리케이션 상태 확인
+# /actuator/info: 애플리케이션에 대한 임의의 정보 표시
+# /actuator/metrics: JVM, CPU, Tomcat 등의 대한 메트링 정보 제공
+# /actuator/loggers: 애플리케이션의 로거 수준을 확인하고 동적으로 변경 가능
+# /actuator/env: 환경 변수, 시스템 속성 등 스프링 환경에 대한 정보를 보여준다. (보안에 민감한 정보 노출 가능 주의)
+
+springdoc:
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  cache:
+    disabled: true
+
+# JWT 토큰 설정
+jwt:
+  #HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용해야 한다.
+  secret: ${JWT_SECRET}
+  access-token-header: Authorization                  # 액세스 토큰 헤더
+  access-token-validity-in-hour: 3h                   # 액세스 토큰 유효기간 (시간)
+  refresh-token-cookie: ${JWT_REFRESH_TOKEN_COOKIE}   # 리프레시 토큰 쿠키 키
+  refresh-token-expiration-days: 60                   # 리프레시 토큰 유효기간 (일)
+  authority-key: auth                                 # 액세스 토큰에서 권한을 가져올 키
+  allowed-clock-skew-seconds: 30
+  # Redis
+  redis:
+    key:
+      prefix: runner                    # 레디스 저장에 필요한 키 값 중 접두어
+      suffix: token_rts                 # 레디스 저장에 필요한 키 값 중 접미어
+    max-token: 1                        # 최대로 발급 가능한 토큰의 수
+
+kakao:
+  client-id: ${KAKAO_CLIENT_ID}
+  redirect-uri: ${KAKAO_REDIRECT_URI}
+  auth-api: https://kauth.kakao.com
+  api: https://kapi.kakao.com
+  connect-timeout-millis: 5000
+  response-timeout-seconds: 5
+  time-out-seconds: 5
+
+image:
+  path: ${IMAGE_PATH}
