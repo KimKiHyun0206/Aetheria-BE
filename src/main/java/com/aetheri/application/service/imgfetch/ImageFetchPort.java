@@ -59,8 +59,17 @@ public class ImageFetchPort implements ImageFetchUseCase {
         String fileName = Paths.get(path).getFileName().toString();
 
         return imagePathValidator.isValidatePath(fileName)
-                .flatMap(this::isValid)
-                .flatMap(v -> fetchImageFromStore(fileName))
+                .flatMap(isValid -> {
+                    if (!isValid) {
+                        return Mono.error(
+                                new BusinessException(
+                                        ErrorMessage.INVALID_IMAGE_PATH,
+                                        "유효한 이미지 요청이 아닙니다."
+                                )
+                        );
+                    }
+                    return fetchImageFromStore(fileName);
+                })
                 .switchIfEmpty(
                         Mono.error(
                                 new BusinessException(
@@ -69,18 +78,6 @@ public class ImageFetchPort implements ImageFetchUseCase {
                                 ))
                 )
                 .doOnSuccess(l -> log.info("이미지 조회에 성공했습니다."));
-    }
-
-    private Mono<Object> isValid(Boolean b) {
-        if (!b) {
-            return Mono.error(
-                    new BusinessException(
-                            ErrorMessage.INVALID_IMAGE_PATH,
-                            "유효한 이미지 요청이 아닙니다."
-                    )
-            );
-        }
-        return Mono.empty();
     }
 
     private Mono<Resource> fetchImageFromStore(String fileName) {
