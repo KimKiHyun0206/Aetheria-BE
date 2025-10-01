@@ -52,7 +52,7 @@ public enum ErrorMessage {
     /**
      * 카카오 리프레시 토큰이 유효하지 않거나 만료되었을 때 발생합니다. (404 Not Found)
      */
-    INVALID_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "카카오 리프레쉬 토큰이 존재하지 않습니다"),
+    INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "카카오 리프레쉬 토큰이 존재하지 않습니다"),
     /**
      * 카카오 API 통신 중 액세스 토큰을 찾을 수 없을 때 발생합니다. (404 Not Found)
      */
