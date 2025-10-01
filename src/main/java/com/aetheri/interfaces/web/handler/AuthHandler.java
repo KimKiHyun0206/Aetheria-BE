@@ -59,7 +59,7 @@ public class AuthHandler {
     }
 
     /**
-     * 클라이언트를 카카오 로그인 페이지로 리다이렉트하여 **인가 코드(Authorization Code) 요청**을 수행합니다.
+     * 클라이언트를 카카오 로그인 페이지로 리다이렉트하여 인가 코드(Authorization Code) 요청을 수행합니다.
      *
      * <a href="https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-code">카카오 REST API 문서 참조</a>
      *
@@ -79,7 +79,7 @@ public class AuthHandler {
     }
 
     /**
-     * 카카오로부터 전달받은 **인가 코드(Code)를 사용하여 액세스 토큰을 발급받고 로그인(회원가입 포함)을 처리**하는 핸들러입니다.
+     * 카카오로부터 전달받은 인가 코드(Code)를 사용하여 액세스 토큰을 발급받고 로그인(회원가입 포함)을 처리하는 핸들러입니다.
      *
      * <p>로그인 성공 후, 액세스 토큰은 응답 헤더에, 리프레시 토큰은 HTTP Only 쿠키에 설정하여 응답합니다.</p>
      *
@@ -112,7 +112,7 @@ public class AuthHandler {
     }
 
     /**
-     * **서비스 로그아웃** 요청을 처리합니다.
+     * 서비스 회원탈퇴 요청을 처리합니다.
      *
      * <p>인증된 사용자 ID를 추출하여 {@code SignOffUseCase}를 실행하고 204 No Content 응답을 반환합니다.</p>
      *
@@ -128,7 +128,7 @@ public class AuthHandler {
     }
 
     /**
-     * **회원 탈퇴** 요청을 처리합니다.
+     * 회원 로그아웃 요청을 처리합니다.
      *
      * <p>인증된 사용자 ID를 추출하여 {@code SignOutUseCase}를 실행하고 204 No Content 응답을 반환합니다.</p>
      *
