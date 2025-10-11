@@ -1,12 +1,11 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.5'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.springframework.boot' version '3.3.1'
+    id 'io.spring.dependency-management' version '1.1.5'
 }
 
 group = 'com'
 version = '0.0.1-SNAPSHOT'
-description = 'Aetheria-BE'
 
 java {
     toolchain {
@@ -19,9 +18,48 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter'
+    // Web
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // R2DBC
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+
+    // R2DBC MySQL 드라이버
+    implementation 'io.asyncer:r2dbc-mysql:1.4.0'
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+
+
+    // Swagger
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4")
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Test 용 라이브러리
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework:spring-webflux'
+
+    // Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // OAuth2
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // Spring Actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 tasks.named('test') {
